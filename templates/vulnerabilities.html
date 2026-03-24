@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vulnerabilities - {{ asset.domain }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    {% if scan_status == 'running' %}
+    <meta http-equiv="refresh" content="10">
+    {% endif %}
+    <style>
+        body {
+            background-color: #0a0e12;
+            font-family: 'Inter', sans-serif;
+            padding-top: 80px;
+            color: #e0e4e8;
+        }
+        .navbar {
+            background-color: #0f1419 !important;
+            border-bottom: 1px solid #1e2a32;
+        }
+        .container {
+            max-width: 1400px;
+        }
+        .btn-outline-shodan {
+            border: 1px solid #2c3a47;
+            color: #b6c2cd;
+            background: transparent;
+        }
+        .btn-outline-shodan:hover {
+            border-color: #f68b1f;
+            color: #f68b1f;
+            background-color: rgba(246,139,31,0.1);
+        }
+        .note-form textarea {
+            background-color: #1f2a33;
+            border: 1px solid #2c3a47;
+            color: #fff;
+            font-size: 0.8rem;
+        }
+        .table {
+            background-color: transparent;
+        }
+        .table thead th {
+            background-color: #1a232b;
+            color: #b6c2cd;
+            border: none;
+        }
+        .table tbody tr {
+            background-color: #141b21;
+        }
+        .table td {
+            border: none;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body data-bs-theme="dark">
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for(dashboard_url) }}">
+            <i class="bi bi-shield-shaded"></i> ASI
+        </a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for(dashboard_url) }}">Back to Dashboard</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h2>Vulnerabilities for {{ asset.domain }}</h2>
+
+    {% if scan_status == 'running' %}
+        <div class="alert alert-warning">
+            <i class="bi bi-arrow-repeat"></i> Scan is in progress. This page will refresh automatically every 10 seconds.
+        </div>
+    {% elif vulns %}
+        <div class="alert alert-info">
+            Found {{ vulns|length }} vulnerabilities
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>URL / Target</th>
+                        <th>Template ID</th>
+                        <th>Name</th>
+                        <th>Severity</th>
+                        <th>Detected At</th>
+                        <th>Analyst Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vuln in vulns %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            {% if vuln.url %}
+                                <a href="{{ vuln.url }}" target="_blank" title="{{ vuln.url }}">{{ vuln.url[:50] }}{% if vuln.url|length > 50 %}...{% endif %}</a>
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>{{ vuln.template_id or "N/A" }}</td>
+                        <td>{{ vuln.name or "N/A" }}</td>
+                        <td>
+                            {% set sev = vuln.severity.lower() if vuln.severity else "unknown" %}
+                            {% if sev == "critical" %}
+                                <span class="badge bg-danger">Critical</span>
+                            {% elif sev == "high" %}
+                                <span class="badge bg-warning text-dark">High</span>
+                            {% elif sev == "medium" %}
+                                <span class="badge bg-info text-dark">Medium</span>
+                            {% elif sev == "low" %}
+                                <span class="badge bg-success">Low</span>
+                            {% elif sev == "info" %}
+                                <span class="badge bg-primary">Info</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ vuln.severity or "unknown" }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ vuln.matched_at.strftime("%Y-%m-%d %H:%M:%S") if vuln.matched_at else "N/A" }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('add_vulnerability_note', vuln_id=vuln.id) }}" class="note-form">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" name="note" class="form-control" placeholder="Add analyst note..." value="{{ vuln.notes or '' }}">
+                                    <button class="btn btn-outline-shodan" type="submit">Save</button>
+                                </div>
+                            </form>
+                            {% if vuln.notes %}
+                                <small class="text-muted mt-1 d-block">Current note: {{ vuln.notes }}</small>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            No vulnerabilities found for this asset. Try running a scan first.
+        </div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

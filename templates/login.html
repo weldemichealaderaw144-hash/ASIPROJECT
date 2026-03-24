@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ASI Secure Terminal</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+    background:black;
+    font-family: 'Share Tech Mono', monospace;
+    color:#00ff9f;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* Terminal Window */
+
+.terminal{
+    width:460px;
+    background:#050505;
+    border:1px solid #00ff9f;
+    border-radius:8px;
+    box-shadow:0 0 25px #00ff9f;
+    padding:25px;
+    position:relative;
+    overflow:hidden;
+}
+
+/* scanning line */
+
+.terminal::after{
+    content:"";
+    position:absolute;
+    top:-100%;
+    left:0;
+    width:100%;
+    height:2px;
+    background:#00ff9f;
+    animation:scan 4s linear infinite;
+}
+
+@keyframes scan{
+    0%{top:-100%;}
+    100%{top:100%;}
+}
+
+/* terminal header */
+
+.terminal-header{
+    font-size:14px;
+    margin-bottom:20px;
+    color:#00ff9f;
+}
+
+/* terminal prompt */
+
+.prompt{
+    margin-bottom:8px;
+}
+
+/* inputs */
+
+.form-control{
+    background:black;
+    border:1px solid #00ff9f;
+    color:#00ff9f;
+}
+
+.form-control:focus{
+    background:black;
+    color:#00ff9f;
+    box-shadow:0 0 10px #00ff9f;
+    border-color:#00ff9f;
+}
+
+/* login button */
+
+.login-btn{
+    margin-top:15px;
+    background:#00ff9f;
+    border:none;
+    color:black;
+    font-weight:bold;
+}
+
+.login-btn:hover{
+    box-shadow:0 0 15px #00ff9f;
+}
+
+/* typing animation */
+
+.typing{
+    overflow:hidden;
+    white-space:nowrap;
+    border-right:2px solid #00ff9f;
+    animation:typing 4s steps(40,end), blink .8s infinite;
+}
+
+@keyframes typing{
+    from{width:0}
+    to{width:100%}
+}
+
+@keyframes blink{
+    50%{border-color:transparent}
+}
+
+.footer{
+    font-size:11px;
+    margin-top:15px;
+    opacity:0.6;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="terminal">
+
+<div class="terminal-header typing">
+Initializing ASI Security Terminal...
+</div>
+
+<form method="POST">
+
+<div class="prompt">
+> Enter Username
+</div>
+
+<input type="text" name="username" class="form-control mb-3" required>
+
+<div class="prompt">
+> Enter Password
+</div>
+
+<input type="password" name="password" class="form-control">
+
+<button class="btn login-btn w-100">
+EXECUTE LOGIN
+</button>
+
+</form>
+
+<div class="footer">
+ASI • Asset Security Intelligence System
+</div>
+
+</div>
+
+</body>
+</html>

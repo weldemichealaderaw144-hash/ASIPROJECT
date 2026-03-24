@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Asset - {{ asset.domain }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 20px;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        .card {
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            padding: 20px;
+            background: #fff;
+            margin-bottom: 20px;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+        textarea.form-control {
+            border-radius: 10px;
+            font-size: 14px;
+            resize: vertical;
+            padding: 12px;
+            border: 1px solid #ddd;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        textarea.form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .form-label small {
+            font-weight: 400;
+            color: #6c757d;
+        }
+        textarea::placeholder {
+            color: #adb5bd;
+            opacity: 1;
+        }
+        .btn-group {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Edit Asset: {{ asset.domain }}</h2>
+    <form method="POST">
+        <input type="hidden" name="domain" value="{{ asset.domain }}">
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row g-4">
+                    <!-- Subdomains -->
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            🌐 Subdomains
+                            <small>(one per line)</small>
+                        </label>
+                        <textarea class="form-control" name="subdomains" rows="5"
+                            placeholder="api.example.com&#10;dev.example.com">{% for s in subdomains %}{{ s }}{% if not loop.last %}
+{% endif %}{% endfor %}</textarea>
+                    </div>
+
+                    <!-- Server IPs -->
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            🖥 Public Server IPs
+                            <small>(one per line)</small>
+                        </label>
+                        <textarea class="form-control" name="server_ips" rows="5"
+                            placeholder="192.168.1.10&#10;8.8.8.8">{% for ip in server_ips %}{{ ip }}{% if not loop.last %}
+{% endif %}{% endfor %}</textarea>
+                    </div>
+
+                    <!-- Open Ports -->
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            🔌 Open Ports
+                            <small>(one per line)</small>
+                        </label>
+                        <textarea class="form-control" name="open_ports" rows="5"
+                            placeholder="80&#10;443&#10;22">{% for p in open_ports %}{{ p }}{% if not loop.last %}
+{% endif %}{% endfor %}</textarea>
+                    </div>
+
+                    <!-- URLs -->
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            🔗 URLs
+                            <small>(one per line)</small>
+                        </label>
+                        <textarea class="form-control" name="urls" rows="5"
+                            placeholder="https://example.com&#10;https://api.example.com">{% for u in urls %}{{ u }}{% if not loop.last %}
+{% endif %}{% endfor %}</textarea>
+                    </div>
+
+                    <!-- Services (new) -->
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            ⚙️ Services
+                            <small>(one per line, e.g., nginx:80)</small>
+                        </label>
+                        <textarea class="form-control" name="services" rows="5"
+                            placeholder="nginx:80&#10;apache:443">{% for s in services %}{{ s }}{% if not loop.last %}
+{% endif %}{% endfor %}</textarea>
+                    </div>
+
+                    <!-- Technologies (new) -->
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            💡 Technologies
+                            <small>(one per line)</small>
+                        </label>
+                        <textarea class="form-control" name="technologies" rows="5"
+                            placeholder="WordPress&#10;React&#10;Cloudflare">{% for t in technologies %}{{ t }}{% if not loop.last %}
+{% endif %}{% endfor %}</textarea>
+                    </div>
+
+                    <!-- Emails (new) -->
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            📧 Emails
+                            <small>(one per line)</small>
+                        </label>
+                        <textarea class="form-control" name="emails" rows="5"
+                            placeholder="admin@example.com&#10;support@example.com">{% for e in emails %}{{ e }}{% if not loop.last %}
+{% endif %}{% endfor %}</textarea>
+                    </div>
+
+                    <!-- Cloud Assets (new) -->
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            ☁️ Cloud Assets
+                            <small>(one per line)</small>
+                        </label>
+                        <textarea class="form-control" name="cloud_assets" rows="5"
+                            placeholder="my-bucket.s3.amazonaws.com&#10;myapp.azurewebsites.net">{% for c in cloud_assets %}{{ c }}{% if not loop.last %}
+{% endif %}{% endfor %}</textarea>
+                    </div>
+
+                    <!-- API Endpoints (new) -->
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            🔗 API Endpoints
+                            <small>(one per line)</small>
+                        </label>
+                        <textarea class="form-control" name="api_endpoints" rows="5"
+                            placeholder="https://api.example.com/v1&#10;https://example.com/api">{% for a in api_endpoints %}{{ a }}{% if not loop.last %}
+{% endif %}{% endfor %}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Save Changes</button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

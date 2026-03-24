@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #f68b1f;
+            --primary-hover: #ffa23f;
+            --bg-dark: #0a0e12;
+            --bg-card: #141b21;
+            --bg-header: #0f1419;
+            --border-color: #1e2a32;
+            --text-primary: #e0e4e8;
+            --text-secondary: #8899a6;
+            --success: #3fb68b;
+            --warning: #f6c445;
+            --danger: #f05f5f;
+            --info: #68a2cf;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            padding-top: 70px;
+            margin: 0;
+        }
+
+        .table td, .table th, .mono-data, .type-value {
+            font-family: 'Roboto Mono', 'Courier New', monospace;
+        }
+
+        .navbar.bg-dark {
+            background-color: var(--bg-header) !important;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .navbar-brand i {
+            color: var(--primary);
+        }
+        .navbar-nav .nav-link {
+            color: var(--text-secondary) !important;
+            transition: color 0.2s;
+        }
+        .navbar-nav .nav-link:hover {
+            color: var(--primary) !important;
+        }
+        .dropdown-menu-dark {
+            background-color: var(--bg-card);
+            border-color: var(--border-color);
+        }
+        .dropdown-item {
+            color: var(--text-secondary);
+        }
+        .dropdown-item:hover {
+            background-color: var(--primary);
+            color: #000;
+        }
+
+        .dashboard-header {
+            background-color: var(--bg-header);
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--primary);
+        }
+        .dashboard-header h1 {
+            font-weight: 400;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+        .dashboard-header h1 i {
+            color: var(--primary);
+        }
+
+        .filter-bar {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+        .filter-bar .input-group {
+            max-width: 400px;
+        }
+        .filter-bar .input-group-text {
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+        .filter-bar input {
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            color: #fff;
+        }
+        .filter-bar input::placeholder {
+            color: var(--text-secondary);
+        }
+        .btn-shodan-primary {
+            background-color: var(--primary);
+            border: none;
+            color: #000;
+            font-weight: 500;
+            padding: 0.375rem 1.5rem;
+        }
+        .btn-shodan-primary:hover {
+            background-color: var(--primary-hover);
+        }
+        .btn-outline-shodan {
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            background: transparent;
+            transition: all 0.2s;
+        }
+        .btn-outline-shodan:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background-color: rgba(246, 139, 31, 0.1);
+        }
+
+        .stat-card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), #ffb86b);
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+        .stat-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.2;
+        }
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-small {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .chart-container {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+        .chart-container h5 {
+            color: var(--primary);
+            font-weight: 400;
+            letter-spacing: -0.3px;
+        }
+
+        .table {
+            background-color: transparent;
+            border-collapse: separate;
+            border-spacing: 0 4px;
+            margin-top: 0;
+        }
+        .table thead th {
+            background-color: var(--bg-card);
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            padding: 0.75rem 1rem;
+        }
+        .table tbody tr {
+            background-color: var(--bg-dark);
+            border-radius: 8px;
+            transition: background-color 0.1s;
+        }
+        .table tbody tr:hover {
+            background-color: #1e2a32 !important;
+        }
+        .table td {
+            padding: 1rem 0.75rem;
+            border: none;
+            color: var(--text-primary);
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
+        .table tbody tr td:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+        .table tbody tr td:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .asset-pill {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            background-color: #1f2a33;
+            color: #fff;
+            border: 1px solid transparent;
+        }
+        .asset-pill i {
+            margin-right: 4px;
+            font-size: 0.6rem;
+        }
+
+        .asset-domain { background-color: #3498db; color: #fff; }
+        .asset-subdomain { background-color: #2ecc71; color: #000; }
+        .asset-url { background-color: #e74c3c; }
+        .asset-ip { background-color: #f39c12; color: #000; }
+        .asset-port { background-color: #9b59b6; }
+        .asset-service { background-color: #1abc9c; color: #000; }
+        .asset-technology { background-color: #e67e22; }
+        .asset-email { background-color: #34495e; }
+        .asset-cloud_asset { background-color: #16a085; }
+        .asset-api_endpoint { background-color: #d35400; }
+        .asset-shadow { background-color: var(--warning); color: #000; }
+
+        .status-approved { color: var(--success); }
+        .status-shadow { color: var(--warning); }
+
+        .risk-badge {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.65rem;
+            border-radius: 20px;
+            background-color: #1f2a33;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .quick-actions {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .quick-action-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            text-decoration: none;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .quick-action-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: scale(1.1);
+            background-color: var(--bg-header);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary), #ffb86b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        a.text-info {
+            color: var(--info) !important;
+        }
+    </style>
+</head>
+<body data-bs-theme="dark">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: #0f1419;">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('attack_surface_intelligence') }}">
+                <i class="bi bi-shield-shaded"></i> ASI <span class="gradient-text">•intel</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">
+                            <i class="bi bi-speedometer2"></i> Main Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('asset_map') }}">
+                            <i class="bi bi-diagram-3"></i> Asset Map
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-folder"></i> Inventory
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='domain') }}"><i class="bi bi-globe"></i> Domains</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='subdomain') }}"><i class="bi bi-diagram-2"></i> Subdomains</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='url') }}"><i class="bi bi-link"></i> URLs</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='ip') }}"><i class="bi bi-hdd-network"></i> IPs</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='port') }}"><i class="bi bi-plug"></i> Ports</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='service') }}"><i class="bi bi-hdd"></i> Services</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='technology') }}"><i class="bi bi-cpu"></i> Technologies</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='email') }}"><i class="bi bi-envelope"></i> Emails</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='cloud_asset') }}"><i class="bi bi-cloud"></i> Cloud Assets</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='api_endpoint') }}"><i class="bi bi-code-slash"></i> API Endpoints</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('view_shadows') }}">
+                            <i class="bi bi-exclamation-triangle"></i> Shadows
+                            {% if shadow_count > 0 %}
+                            <span class="badge bg-warning text-dark ms-1">{{ shadow_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <span class="nav-link">
+                            <i class="bi bi-person-circle"></i> {{ session.get('username') }}
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2>የጥቃት መድረክ <small>ንብረቶች · መረጃ ትንተና</small></h2>
+
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="btn btn-outline-shodan me-2" onclick="refreshStats()">
+                        <i class="bi bi-arrow-repeat" id="refresh-icon"></i> Refresh
+                    </button>
+                    <a href="{{ url_for('export_asi') }}" class="btn btn-shodan-primary">
+                        <i class="bi bi-download"></i> Export
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid px-4">
+        <!-- Filter bar (optional) -->
+        <div class="filter-bar">
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" placeholder="Filter assets by name, type, or value..." id="assetFilter">
+            </div>
+            <button class="btn btn-shodan-primary" type="button" id="filterBtn"><i class="bi bi-funnel"></i> Apply</button>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-building"></i></div>
+                    <div class="stat-value">{{ total_assets }}</div>
+                    <div class="stat-label">Total Assets</div>
+                    <div class="stat-small">{{ domains_count }} domains</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-diagram-3"></i></div>
+                    <div class="stat-value">{{ domains_count + subdomains_count }}</div>
+                    <div class="stat-label">Domains + Subdomains</div>
+                    <div class="stat-small">{{ subdomains_count }} subdomains</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-hdd-stack"></i></div>
+                    <div class="stat-value">{{ urls_count + api_count }}</div>
+                    <div class="stat-label">URLs + APIs</div>
+                    <div class="stat-small">{{ urls_count }} URLs, {{ api_count }} APIs</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-exclamation-triangle-fill" style="color: var(--warning);"></i></div>
+                    <div class="stat-value">{{ shadow_count }}</div>
+                    <div class="stat-label">Shadow Assets</div>
+                    <div class="stat-small">{{ recent_discoveries }} new (7d)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional stats row for new types -->
+        <div class="row g-4 mt-2">
+            <div class="col-md-2">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-hdd"></i></div>
+                    <div class="stat-value">{{ services_count }}</div>
+                    <div class="stat-label">Services</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-cpu"></i></div>
+                    <div class="stat-value">{{ tech_count }}</div>
+                    <div class="stat-label">Technologies</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-envelope"></i></div>
+                    <div class="stat-value">{{ email_count }}</div>
+                    <div class="stat-label">Emails</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-cloud"></i></div>
+                    <div class="stat-value">{{ cloud_count }}</div>
+                    <div class="stat-label">Cloud Assets</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-code-slash"></i></div>
+                    <div class="stat-value">{{ api_count }}</div>
+                    <div class="stat-label">API Endpoints</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-shield"></i></div>
+                    <div class="stat-value">{{ ports_count }}</div>
+                    <div class="stat-label">Open Ports</div>
+                </div>
+            </div>
+        </div>
+
+
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5><i class="bi bi-check-circle"></i> Status Distribution</h5>
+                    <div id="statusChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5><i class="bi bi-exclamation-triangle"></i> Risk Distribution</h5>
+                    <div id="riskChart"></div>
+                </div>
+            </div>
+
+
+        <!-- Top Risk Assets & Asset Breakdown -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5 class="mb-3"><i class="bi bi-exclamation-triangle-fill text-danger"></i> Top Risk Assets</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+
+                                    <th>Domain</th>
+                                    <th>Risk Score</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for asset in top_risk_assets %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('asset_dashboard', asset_id=asset.id) }}" class="text-info text-decoration-none">
+                                            {{ asset.domain }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="risk-badge">
+                                            {% if asset.risk_score >= 80 %}
+                                                🔥 Extreme ({{ asset.risk_score }})
+                                            {% elif asset.risk_score >= 50 %}
+                                                💀 Severe ({{ asset.risk_score }})
+                                            {% elif asset.risk_score >= 20 %}
+                                                ⚠️ Critical ({{ asset.risk_score }})
+                                            {% elif asset.risk_score >= 10 %}
+                                                ⬆️ High ({{ asset.risk_score }})
+                                            {% elif asset.risk_score >= 5 %}
+                                                ➡️ Medium ({{ asset.risk_score }})
+                                            {% elif asset.risk_score > 0 %}
+                                                ⬇️ Low ({{ asset.risk_score }})
+                                            {% else %}
+                                                ⚪ None (0)
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if asset.monitoring_enabled %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Paused</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('view_asset', asset_id=asset.id) }}" class="btn btn-sm btn-outline-shodan" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('view_vulnerabilities', asset_id=asset.id) }}" class="btn btn-sm btn-outline-shodan" title="View Vulnerabilities">
+                                            <i class="bi bi-bug"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Asset Breakdown -->
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5 class="mb-3"><i class="bi bi-grid-3x3-gap-fill"></i> Asset Breakdown</h5>
+                    <div class="row g-3">
+                        <!-- Original types -->
+                        <div class="col-4 text-center">
+                            <span class="asset-pill asset-domain"><i class="bi bi-globe"></i> Domain</span>
+                            <h4 class="mt-2">{{ domains_count }}</h4>
+                        </div>
+                        <div class="col-4 text-center">
+                            <span class="asset-pill asset-subdomain"><i class="bi bi-diagram-2"></i> Subdomain</span>
+                            <h4 class="mt-2">{{ subdomains_count }}</h4>
+                        </div>
+                        <div class="col-4 text-center">
+                            <span class="asset-pill asset-url"><i class="bi bi-link"></i> URL</span>
+                            <h4 class="mt-2">{{ urls_count }}</h4>
+                        </div>
+                        <div class="col-4 text-center">
+                            <span class="asset-pill asset-ip"><i class="bi bi-hdd-network"></i> IP</span>
+                            <h4 class="mt-2">{{ ips_count }}</h4>
+                        </div>
+                        <div class="col-4 text-center">
+                            <span class="asset-pill asset-port"><i class="bi bi-plug"></i> Port</span>
+                            <h4 class="mt-2">{{ ports_count }}</h4>
+                        </div>
+                        <div class="col-4 text-center">
+                            <span class="asset-pill asset-shadow"><i class="bi bi-exclamation-triangle"></i> Shadow</span>
+                            <h4 class="mt-2">{{ shadow_count }}</h4>
+                        </div>
+                        <!-- New types -->
+                        <div class="col-4 text-center">
+                            <span class="asset-pill asset-service"><i class="bi bi-hdd"></i> Service</span>
+                            <h4 class="mt-2">{{ services_count }}</h4>
+                        </div>
+                        <div class="col-4 text-center">
+                            <span class="asset-pill asset-technology"><i class="bi bi-cpu"></i> Tech</span>
+                            <h4 class="mt-2">{{ tech_count }}</h4>
+                        </div>
+                        <div class="col-4 text-center">
+                            <span class="asset-pill asset-email"><i class="bi bi-envelope"></i> Email</span>
+                            <h4 class="mt-2">{{ email_count }}</h4>
+                        </div>
+                        <div class="col-4 text-center">
+                            <span class="asset-pill asset-cloud_asset"><i class="bi bi-cloud"></i> Cloud</span>
+                            <h4 class="mt-2">{{ cloud_count }}</h4>
+                        </div>
+                        <div class="col-4 text-center">
+                            <span class="asset-pill asset-api_endpoint"><i class="bi bi-code-slash"></i> API</span>
+                            <h4 class="mt-2">{{ api_count }}</h4>
+                        </div>
+                    </div>
+
+                    <hr class="bg-secondary my-4">
+
+                    <div class="row">
+                        <div class="col-12">
+                            <h6 class="text-info"><i class="bi bi-tools"></i> Discovery Tools</h6>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <ul class="list-unstyled small">
+                                        <li><i class="bi bi-check-circle-fill text-success"></i> Subfinder</li>
+                                        <li><i class="bi bi-check-circle-fill text-success"></i> Amass</li>
+                                        <li><i class="bi bi-check-circle-fill text-success"></i> Assetfinder</li>
+                                        <li><i class="bi bi-check-circle-fill text-success"></i> DNSX</li>
+                                        <li><i class="bi bi-check-circle-fill text-success"></i> HTTPX</li>
+                                        <li><i class="bi bi-check-circle-fill text-success"></i> Naabu</li>
+                                    </ul>
+                                </div>
+                                <div class="col-6">
+                                    <ul class="list-unstyled small">
+                                        <li><i class="bi bi-check-circle-fill text-success"></i> Katana</li>
+                                        <li><i class="bi bi-check-circle-fill text-success"></i> GAU</li>
+                                        <li><i class="bi bi-check-circle-fill text-success"></i> Nuclei</li>
+                                        <li><i class="bi bi-check-circle-fill text-success"></i> Gowitness</li>
+                                        <li><i class="bi bi-check-circle-fill text-success"></i> Subzy</li>
+                                        <li><i class="bi bi-check-circle-fill text-success"></i> WhatWeb / Wappalyzer</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="chart-container">
+                    <h5 class="mb-3"><i class="bi bi-activity"></i> Recent Discoveries</h5>
+                    <div class="table-responsive">
+                        <table class="table" id="recentTable">
+                            <thead>
+
+                                    <th>Type</th>
+                                    <th>Value</th>
+                                    <th>Asset</th>
+                                    <th>Status</th>
+                                    <th>Discovered By</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in inventory %}
+                                <tr>
+                                    <td>
+                                        <span class="asset-pill asset-{{ item.asset_type }}">
+                                            {{ item.asset_type }}
+                                        </span>
+                                    </td>
+                                    <td class="mono-data">{{ item.value[:50] }}{% if item.value|length > 50 %}...{% endif %}</td>
+                                    <td>
+                                        {% if item.asset %}
+                                            <a href="{{ url_for('asset_dashboard', asset_id=item.asset.id) }}" class="text-info text-decoration-none">
+                                                {{ item.asset.domain }}
+                                            </a>
+                                        {% else %}
+                                            <span class="text-secondary">Orphan</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if item.status == 'approved' %}
+                                            <span class="status-approved"><i class="bi bi-check-circle"></i> Approved</span>
+                                        {% else %}
+                                            <span class="status-shadow"><i class="bi bi-exclamation-triangle"></i> Shadow</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><i class="bi bi-tools"></i> {{ item.discovered_by }}</td>
+                                    <td class="mono-data">{{ item.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <a href="#" class="quick-action-btn" onclick="scrollToTop(); return false;" title="Scroll to top">
+            <i class="bi bi-arrow-up"></i>
+        </a>
+        <a href="{{ url_for('add_asset') }}" class="quick-action-btn" title="Add asset">
+            <i class="bi bi-plus-lg"></i>
+        </a>
+        <a href="{{ url_for('asset_map') }}" class="quick-action-btn" title="View map">
+            <i class="bi bi-diagram-3"></i>
+        </a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Render charts
+
+
+        {% if charts.status_distribution %}
+        var statusChart = {{ charts.status_distribution | safe }};
+        Plotly.newPlot('statusChart', statusChart.data, statusChart.layout);
+        {% endif %}
+
+        {% if charts.risk_distribution %}
+        var riskChart = {{ charts.risk_distribution | safe }};
+        Plotly.newPlot('riskChart', riskChart.data, riskChart.layout);
+        {% endif %}
+
+
+        function refreshStats() {
+            var icon = document.getElementById('refresh-icon');
+            icon.classList.add('spinner-border spinner-border-sm');
+            fetch('/asi/stats')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Stats updated:', data);
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    icon.classList.remove('spinner-border spinner-border-sm');
+                });
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.addEventListener('resize', function() {
+            if (typeof typeChart !== 'undefined') Plotly.relayout('typeChart', { width: document.getElementById('typeChart').offsetWidth });
+            if (typeof statusChart !== 'undefined') Plotly.relayout('statusChart', { width: document.getElementById('statusChart').offsetWidth });
+            if (typeof riskChart !== 'undefined') Plotly.relayout('riskChart', { width: document.getElementById('riskChart').offsetWidth });
+            if (typeof timelineChart !== 'undefined') Plotly.relayout('timelineChart', { width: document.getElementById('timelineChart').offsetWidth });
+        });
+
+        // Simple filter for inventory table
+        document.getElementById('filterBtn')?.addEventListener('click', function() {
+            let filter = document.getElementById('assetFilter').value.toLowerCase();
+            let table = document.getElementById('recentTable');
+            if (!table) return;
+            let rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            for (let row of rows) {
+                let type = row.cells[0]?.innerText.toLowerCase() || '';
+                let value = row.cells[1]?.innerText.toLowerCase() || '';
+                let asset = row.cells[2]?.innerText.toLowerCase() || '';
+                if (type.includes(filter) || value.includes(filter) || asset.includes(filter) || filter === '') {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

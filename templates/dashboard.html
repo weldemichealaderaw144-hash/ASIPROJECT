@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ASI Admin Dashboard</title>
+    <!-- Bootstrap 5 (dark theme) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* same styles as before – unchanged */
+        body {
+            background-color: #0a0e12;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding-top: 80px;
+            color: #e0e4e8;
+        }
+        .table td, .table th, .mono-data {
+            font-family: 'Roboto Mono', 'Courier New', monospace;
+        }
+        .navbar.bg-dark {
+            background-color: #0f1419 !important;
+            border-bottom: 1px solid #1e2a32;
+        }
+        .navbar-brand i {
+            color: #f68b1f;
+        }
+        .container {
+            max-width: 1600px;
+        }
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+        .page-header h2 {
+            font-weight: 400;
+            font-size: 1.8rem;
+            color: #fff;
+            letter-spacing: -0.5px;
+            margin: 0;
+        }
+        .page-header h2 small {
+            font-size: 1rem;
+            color: #8899a6;
+            font-weight: 300;
+            margin-left: 10px;
+        }
+        .filter-bar {
+            background-color: #141b21;
+            border: 1px solid #1f2a33;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+        .filter-bar .input-group {
+            max-width: 400px;
+        }
+        .filter-bar .input-group-text {
+            background-color: #1f2a33;
+            border: none;
+            color: #8899a6;
+        }
+        .filter-bar input {
+            background-color: #1f2a33;
+            border: none;
+            color: #fff;
+        }
+        .filter-bar input::placeholder {
+            color: #5f7a8c;
+        }
+        .filter-bar .btn-shodan {
+            background-color: transparent;
+            border: 1px solid #f68b1f;
+            color: #f68b1f;
+            padding: 0.375rem 1.5rem;
+            font-weight: 500;
+        }
+        .filter-bar .btn-shodan:hover {
+            background-color: #f68b1f;
+            color: #000;
+        }
+        .table {
+            background-color: transparent;
+            border-collapse: separate;
+            border-spacing: 0 4px;
+            margin-top: 0;
+        }
+        .table thead th {
+            background-color: #1a232b;
+            color: #b6c2cd;
+            font-weight: 500;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            padding: 0.75rem 1rem;
+        }
+        .table tbody tr {
+            background-color: #141b21;
+            border-radius: 8px;
+            transition: background-color 0.1s ease;
+        }
+        .table tbody tr:hover {
+            background-color: #1e2a32 !important;
+        }
+        .table td {
+            padding: 1rem 0.75rem;
+            border: none;
+            color: #d1d9e0;
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
+        .table tbody tr td:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+        .table tbody tr td:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        .domain-link {
+            font-weight: 500;
+            color: #f68b1f;
+            text-decoration: none;
+        }
+        .domain-link:hover {
+            text-decoration: underline;
+        }
+        .small-details {
+            font-size: 0.75rem;
+            color: #738e9e;
+        }
+        .severity-pill {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+            border-radius: 20px;
+            margin-right: 3px;
+            background-color: #1f2a33;
+            color: #cbd5e0;
+        }
+        .severity-pill i {
+            margin-right: 3px;
+            font-size: 0.6rem;
+        }
+        .severity-critical { color: #ff5f5f; }
+        .severity-high { color: #ff9f4b; }
+        .severity-medium { color: #ffd351; }
+        .severity-low { color: #6bd4b2; }
+        .severity-info { color: #68a2cf; }
+        .risk-badge {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.65rem;
+            border-radius: 20px;
+            background-color: #1f2a33;
+            font-weight: 500;
+        }
+        .scan-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-dot.completed { background-color: #3fb68b; box-shadow: 0 0 6px #3fb68b; }
+        .status-dot.running { background-color: #f6c445; box-shadow: 0 0 6px #f6c445; animation: pulse 1.5s infinite; }
+        .status-dot.failed { background-color: #f05f5f; }
+        .status-dot.pending { background-color: #4e6679; }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.3rem 1rem;
+            font-size: 0.75rem;
+            margin-top: 5px;
+        }
+        .tool-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #a0b8cc;
+        }
+        .tool-item i {
+            font-size: 0.7rem;
+            width: 16px;
+            color: #5f7a8c;
+        }
+        .tool-status {
+            font-family: 'Roboto Mono', monospace;
+            margin-left: auto;
+        }
+        .monitoring-badge-custom {
+            background-color: #1f2a33;
+            border: 1px solid #2c3a47;
+            color: #bdd3e8;
+            font-size: 0.7rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
+        }
+        .btn-outline-shodan {
+            border: 1px solid #2c3a47;
+            color: #b6c2cd;
+            background: transparent;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.8rem;
+        }
+        .btn-outline-shodan:hover {
+            border-color: #f68b1f;
+            color: #f68b1f;
+            background-color: rgba(246, 139, 31, 0.1);
+        }
+        .btn-shodan-primary {
+            background-color: #f68b1f;
+            border: none;
+            color: #0a0e12;
+            font-weight: 500;
+        }
+        .btn-shodan-primary:hover {
+            background-color: #ffa23f;
+        }
+        .dropdown-menu {
+            background-color: #1a232b;
+            border: 1px solid #2e3b48;
+        }
+        .dropdown-item {
+            color: #d1d9e0;
+        }
+        .dropdown-item:hover {
+            background-color: #f68b1f;
+            color: #000;
+        }
+        .wide-select {
+            min-width: 200px;
+            background-color: #1f2a33;
+            border: 1px solid #2c3a47;
+            color: #fff;
+        }
+        .input-group-text {
+            background-color: #1f2a33;
+            border: 1px solid #2c3a47;
+            color: #b6c2cd;
+        }
+    </style>
+</head>
+<body data-bs-theme="dark">
+
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: #0f1419;">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+            <i class="bi bi-shield-shaded"></i> Attack Surface Intel <span style="color:#f68b1f;">Admin</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                {% if session.get('role') == 'admin' %}
+                    <li class="nav-item"><a href="{{ url_for('add_asset') }}" class="btn btn-sm btn-outline-shodan me-2"><i class="bi bi-plus-circle"></i> Add Asset</a></li>
+                    <li class="nav-item"><a href="{{ url_for('admin_users') }}" class="btn btn-sm btn-outline-shodan me-2"><i class="bi bi-people"></i> Users</a></li>
+                    <li class="nav-item"><a href="{{ url_for('activity_logs') }}" class="btn btn-sm btn-outline-shodan me-2"><i class="bi bi-journal-text"></i> Logs</a></li>
+                    <li class="nav-item"><a href="{{ url_for('attack_surface_intelligence') }}" class="btn btn-sm btn-outline-shodan me-2"><i class="bi bi-graph-up"></i> ASI Intel</a></li>
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <span class="navbar-text text-light me-3">
+                        <i class="bi bi-person-circle"></i> {{ session.get('username') }} ({{ session.get('role') }})
+                    </span>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="page-header">
+        <h2>የጥቃት ቦታ መዝገብ  <small>– ሀብቶች · አደጋ · እንቅስቃሴ መከታተያ</small></h2>
+        <div class="filter-bar">
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" placeholder="Filter by domain, IP, or tag..." id="assetFilter">
+            </div>
+            <button class="btn btn-shodan-primary" type="button" id="filterBtn"><i class="bi bi-funnel"></i> Apply</button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table" id="assetTable">
+            <thead>
+
+                    <th>ID</th>
+                    <th>Domain</th>
+                    <th>Created</th>
+                    <th>Approved / Shadow</th>
+                    <th>Risk & Severity</th>
+                    <th>Scan Progress</th>
+                    <th>Monitoring</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for asset in assets %}
+                {% set approved_count = approved_counts.get(asset.id, 0) %}
+                {% set shadow_count = shadow_counts.get(asset.id, 0) %}
+                {% set sev = severity_counts.get(asset.id, {}) %}
+                {% set last_scan = asset_scans.get(asset.id) %}
+
+                <tr data-asset-id="{{ asset.id }}">
+                    <td class="mono-data">#{{ asset.id }}</td>
+                    <td>
+                        <div><a href="{{ url_for('asset_dashboard', asset_id=asset.id) }}" class="domain-link">{{ asset.domain }}</a></div>
+                        <div class="small-details"><i class="bi bi-box-arrow-up-right"></i> {{ asset.created_at.strftime('%Y-%m-%d') }}</div>
+                    </td>
+                    <td class="mono-data">{{ asset.created_at.strftime('%Y-%m-%d<br>%H:%M') | safe }}</td>
+                    <td>
+                        <span class="monitoring-badge-custom"><i class="bi bi-check-circle" style="color:#3fb68b;"></i> {{ approved_count }} Approved</span>
+                        <span class="monitoring-badge-custom"><i class="bi bi-exclamation-triangle" style="color:#f6c445;"></i> {{ shadow_count }} Shadow</span>
+                    </td>
+                    <td id="risk-score-{{ asset.id }}">
+                        {% set score = asset.risk_score %}
+                        <span class="risk-badge">
+                            {% if score >= 80 %}🔥 Extreme{% elif score >= 50 %}💀 Severe{% elif score >= 20 %}⚠️ Critical{% elif score >= 10 %}⬆️ High{% elif score >= 5 %}➡️ Medium{% elif score > 0 %}⬇️ Low{% else %}⚪ None{% endif %}
+                            ({{ score }})
+                        </span><br>
+                        <span class="severity-pill"><i class="bi bi-circle-fill severity-critical"></i> C: {{ sev.get('critical', 0) }}</span>
+                        <span class="severity-pill"><i class="bi bi-circle-fill severity-high"></i> H: {{ sev.get('high', 0) }}</span>
+                        <span class="severity-pill"><i class="bi bi-circle-fill severity-medium"></i> M: {{ sev.get('medium', 0) }}</span>
+                        <span class="severity-pill"><i class="bi bi-circle-fill severity-low"></i> L: {{ sev.get('low', 0) }}</span>
+                        <span class="severity-pill"><i class="bi bi-circle-fill severity-info"></i> I: {{ sev.get('info', 0) }}</span>
+                    </td>
+                    <td>
+                        <div id="scan-status-{{ asset.id }}" class="scan-status mb-2">
+                            {% if last_scan %}
+                                <span class="status-dot {{ last_scan.status }}"></span>
+                                <span class="badge bg-{{ 'success' if last_scan.status == 'completed' else 'warning' if last_scan.status == 'running' else 'danger' if last_scan.status == 'failed' else 'secondary' }}">{{ last_scan.status }}</span>
+                            {% else %}
+                                <span class="status-dot pending"></span>
+                                <span class="badge bg-secondary">not_started</span>
+                            {% endif %}
+                        </div>
+                        <div class="tool-grid">
+                            <!-- ✅ Only the 9 required tools + DNSX (part of tools) and additional tech detection -->
+                            <div class="tool-item"><i class="bi bi-search"></i> subfinder <span id="subfinder-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.subfinder_status == 'done' else 'warning' if last_scan and last_scan.subfinder_status == 'running' else 'danger' if last_scan and last_scan.subfinder_status == 'failed' else 'secondary' }}">{{ last_scan.subfinder_status if last_scan else 'pending' }}</span></div>
+                            <div class="tool-item"><i class="bi bi-diagram-3"></i> amass <span id="amass-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.amass_status == 'done' else 'warning' if last_scan and last_scan.amass_status == 'running' else 'danger' if last_scan and last_scan.amass_status == 'failed' else 'secondary' }}">{{ last_scan.amass_status if last_scan else 'pending' }}</span></div>
+                            <div class="tool-item"><i class="bi bi-files"></i> assetfinder <span id="assetfinder-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.assetfinder_status == 'done' else 'warning' if last_scan and last_scan.assetfinder_status == 'running' else 'danger' if last_scan and last_scan.assetfinder_status == 'failed' else 'secondary' }}">{{ last_scan.assetfinder_status if last_scan else 'pending' }}</span></div>
+                            <div class="tool-item"><i class="bi bi-hdd"></i> dnsx <span id="dnsx-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.dnsx_status == 'done' else 'warning' if last_scan and last_scan.dnsx_status == 'running' else 'danger' if last_scan and last_scan.dnsx_status == 'failed' else 'secondary' }}">{{ last_scan.dnsx_status if last_scan else 'pending' }}</span></div>
+                            <div class="tool-item"><i class="bi bi-hdd-network"></i> httpx <span id="httpx-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.httpx_status == 'done' else 'warning' if last_scan and last_scan.httpx_status == 'running' else 'danger' if last_scan and last_scan.httpx_status == 'failed' else 'secondary' }}">{{ last_scan.httpx_status if last_scan else 'pending' }}</span></div>
+                            <div class="tool-item"><i class="bi bi-hdd-stack"></i> naabu <span id="naabu-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.naabu_status == 'done' else 'warning' if last_scan and last_scan.naabu_status == 'running' else 'danger' if last_scan and last_scan.naabu_status == 'failed' else 'secondary' }}">{{ last_scan.naabu_status if last_scan else 'pending' }}</span></div>
+                            <div class="tool-item"><i class="bi bi-scissors"></i> katana <span id="katana-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.katana_status == 'done' else 'warning' if last_scan and last_scan.katana_status == 'running' else 'danger' if last_scan and last_scan.katana_status == 'failed' else 'secondary' }}">{{ last_scan.katana_status if last_scan else 'pending' }}</span></div>
+                            <div class="tool-item"><i class="bi bi-clock-history"></i> gau <span id="gau-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.gau_status == 'done' else 'warning' if last_scan and last_scan.gau_status == 'running' else 'danger' if last_scan and last_scan.gau_status == 'failed' else 'secondary' }}">{{ last_scan.gau_status if last_scan else 'pending' }}</span></div>
+                            <div class="tool-item"><i class="bi bi-bug"></i> nuclei <span id="nuclei-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.nuclei_status == 'done' else 'warning' if last_scan and last_scan.nuclei_status == 'running' else 'danger' if last_scan and last_scan.nuclei_status == 'failed' else 'secondary' }}">{{ last_scan.nuclei_status if last_scan else 'pending' }}</span></div>
+                            <div class="tool-item"><i class="bi bi-camera"></i> gowitness <span id="gowitness-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.gowitness_status == 'done' else 'warning' if last_scan and last_scan.gowitness_status == 'running' else 'danger' if last_scan and last_scan.gowitness_status == 'failed' else 'secondary' }}">{{ last_scan.gowitness_status if last_scan else 'pending' }}</span></div>
+                            <div class="tool-item"><i class="bi bi-shield-exclamation"></i> subzy <span id="subzy-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.subzy_status == 'done' else 'warning' if last_scan and last_scan.subzy_status == 'running' else 'danger' if last_scan and last_scan.subzy_status == 'failed' else 'secondary' }}">{{ last_scan.subzy_status if last_scan else 'pending' }}</span></div>
+                            <div class="tool-item"><i class="bi bi-cpu"></i> whatweb <span id="whatweb-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.whatweb_status == 'done' else 'warning' if last_scan and last_scan.whatweb_status == 'running' else 'danger' if last_scan and last_scan.whatweb_status == 'failed' else 'secondary' }}">{{ last_scan.whatweb_status if last_scan else 'pending' }}</span></div>
+<div class="tool-item"><i class="bi bi-envelope"></i> theharvester <span id="theharvester-status-{{ asset.id }}" class="tool-status text-...">{{ last_scan.theharvester_status if last_scan else 'pending' }}</span></div>
+                            <div class="tool-item"><i class="bi bi-braces"></i> wappalyzer <span id="wappalyzer-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.wappalyzer_status == 'done' else 'warning' if last_scan and last_scan.wappalyzer_status == 'running' else 'danger' if last_scan and last_scan.wappalyzer_status == 'failed' else 'secondary' }}">{{ last_scan.wappalyzer_status if last_scan else 'pending' }}</span></div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex flex-column align-items-start gap-2">
+                            <span class="monitoring-badge-custom">
+                                <i class="bi bi-{{ 'play' if asset.monitoring_enabled else 'pause' }}"></i>
+                                {{ 'Enabled' if asset.monitoring_enabled else 'Disabled' }}
+                            </span>
+                            {% if session.get('role') == 'admin' %}
+                                <a href="{{ url_for('toggle_schedule', asset_id=asset.id) }}"
+                                   class="btn btn-sm btn-outline-shodan"
+                                   onclick="return confirm('{{ 'Disable' if asset.monitoring_enabled else 'Enable' }} scheduled scans for {{ asset.domain }}?')">
+                                    <i class="bi bi-{{ 'pause' if asset.monitoring_enabled else 'play' }}"></i>
+                                    {{ 'Pause' if asset.monitoring_enabled else 'Resume' }}
+                                </a>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        {% if session.get('role') == 'admin' %}
+                            <form method="POST" action="{{ url_for('update_schedule', asset_id=asset.id) }}" class="mb-2">
+                                <div class="input-group input-group-sm">
+                                    <select name="frequency" class="form-select wide-select">
+                                        <option value="manual" {% if not asset.monitoring_enabled %}selected{% endif %}>Immediate scan</option>
+                                        <option value="hourly" {% if asset.monitoring_frequency=='hourly' and asset.monitoring_enabled %}selected{% endif %}>Hourly</option>
+                                        <option value="daily" {% if asset.monitoring_frequency=='daily' and asset.monitoring_enabled %}selected{% endif %}>Daily</option>
+                                        <option value="weekly" {% if asset.monitoring_frequency=='weekly' and asset.monitoring_enabled %}selected{% endif %}>Weekly</option>
+                                        <option value="monthly" {% if asset.monitoring_frequency=='monthly' and asset.monitoring_enabled %}selected{% endif %}>Monthly</option>
+                                    </select>
+                                    <div class="input-group-text">
+                                        <input type="checkbox" name="run_now" value="1" id="run_now_{{ asset.id }}">
+                                        <label for="run_now_{{ asset.id }}" class="ms-1 small">run now</label>
+                                    </div>
+                                    <button class="btn btn-outline-shodan" type="submit">
+                                        <i class="bi bi-save"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        {% endif %}
+
+                        <div class="action-btn-group d-flex gap-1">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-shodan dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-gear"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{{ url_for('asset_dashboard', asset_id=asset.id) }}"><i class="bi bi-eye"></i> View Asset</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('view_report', asset_id=asset.id) }}"><i class="bi bi-file-text"></i> Report</a></li>
+                                    {% if session.get('role') == 'admin' %}
+                                        <li><hr class="dropdown-divider"></li>
+                                        {% if last_scan and last_scan.status == 'running' %}
+                                            <li><a class="dropdown-item text-danger" href="{{ url_for('stop_scan', scan_id=last_scan.id) }}" onclick="return confirm('Stop current scan?');"><i class="bi bi-stop-circle"></i> Stop Scan</a></li>
+                                        {% else %}
+                                            <li><a class="dropdown-item" href="{{ url_for('scan_asset', asset_id=asset.id) }}"><i class="bi bi-play-circle"></i> Start Scan</a></li>
+                                        {% endif %}
+                                        <li><a class="dropdown-item text-warning" href="{{ url_for('edit_asset', asset_id=asset.id) }}"><i class="bi bi-pencil"></i> Edit Asset</a></li>
+                                        <li><a class="dropdown-item text-danger" href="{{ url_for('delete_asset', asset_id=asset.id) }}" onclick="return confirm('Permanently delete this asset?');"><i class="bi bi-trash"></i> Delete</a></li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            <a href="{{ url_for('view_report', asset_id=asset.id) }}" class="btn btn-sm btn-outline-shodan">
+                                <i class="bi bi-file-earmark-text"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function statusColorClass(status) {
+    if (status === 'done' || status === 'completed') return 'success';
+    if (status === 'running') return 'warning';
+    if (status === 'failed') return 'danger';
+    if (status === 'skipped') return 'secondary';
+    return 'secondary';
+}
+
+function scanBadgeClass(status) {
+    if (status === 'completed') return 'success';
+    if (status === 'running') return 'warning';
+    if (status === 'failed') return 'danger';
+    return 'secondary';
+}
+
+function updateScanStatus(assetId) {
+    const statusEl = document.getElementById(`scan-status-${assetId}`);
+    if (statusEl) statusEl.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> loading...';
+
+    fetch(`/api/scan-progress/${assetId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (statusEl) {
+                const badgeClass = scanBadgeClass(data.status);
+                statusEl.innerHTML = `<span class="status-dot ${data.status}"></span> <span class="badge bg-${badgeClass}">${data.status}</span>`;
+            }
+
+            // ✅ Only the 9 tools (plus dnsx and tech detections) – adjust list as needed
+            const tools = [
+                'subfinder', 'amass', 'assetfinder', 'dnsx', 'httpx',
+                'naabu', 'katana', 'gau', 'nuclei', 'gowitness',
+                'subzy', 'whatweb', 'wappalyzer','theharvester'
+            ];
+            tools.forEach(tool => {
+                const el = document.getElementById(`${tool}-status-${assetId}`);
+                if (el) {
+                    const status = data[tool] || 'pending';
+                    el.innerText = status;
+                    el.className = el.className.replace(/text-\S+/g, '').trim();
+                    el.classList.add(`text-${statusColorClass(status)}`);
+                }
+            });
+
+            const riskTd = document.getElementById(`risk-score-${assetId}`);
+            if (riskTd && data.severity_counts) {
+                const score = data.risk_score || 0;
+                let html = `<span class="risk-badge">`;
+                if (score >= 80) html += `🔥 Extreme (${score})`;
+                else if (score >= 50) html += `💀 Severe (${score})`;
+                else if (score >= 20) html += `⚠️ Critical (${score})`;
+                else if (score >= 10) html += `⬆️ High (${score})`;
+                else if (score >= 5) html += `➡️ Medium (${score})`;
+                else if (score > 0) html += `⬇️ Low (${score})`;
+                else html += `⚪ None (0)`;
+                html += `</span><br>`;
+                html += `<span class="severity-pill"><i class="bi bi-circle-fill severity-critical"></i> C: ${data.severity_counts.critical}</span>`;
+                html += `<span class="severity-pill"><i class="bi bi-circle-fill severity-high"></i> H: ${data.severity_counts.high}</span>`;
+                html += `<span class="severity-pill"><i class="bi bi-circle-fill severity-medium"></i> M: ${data.severity_counts.medium}</span>`;
+                html += `<span class="severity-pill"><i class="bi bi-circle-fill severity-low"></i> L: ${data.severity_counts.low}</span>`;
+                html += `<span class="severity-pill"><i class="bi bi-circle-fill severity-info"></i> I: ${data.severity_counts.info}</span>`;
+                riskTd.innerHTML = html;
+            }
+        })
+        .catch(err => {
+            console.error(`Error updating asset ${assetId}:`, err);
+            if (statusEl) statusEl.innerHTML = '<span class="badge bg-danger">error</span>';
+        });
+}
+
+setInterval(() => {
+    document.querySelectorAll("[data-asset-id]").forEach(row => {
+        const assetId = row.dataset.assetId;
+        const statusEl = document.getElementById(`scan-status-${assetId}`);
+        if (statusEl && statusEl.innerText.includes('running')) {
+            updateScanStatus(assetId);
+        }
+    });
+}, 5000);
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll("[data-asset-id]").forEach(row => updateScanStatus(row.dataset.assetId));
+});
+
+document.getElementById('filterBtn')?.addEventListener('click', function() {
+    let filter = document.getElementById('assetFilter').value.toLowerCase();
+    document.querySelectorAll('#assetTable tbody tr').forEach(row => {
+        let domain = row.querySelector('.domain-link')?.innerText.toLowerCase() || '';
+        if (domain.includes(filter) || filter === '') {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shadow Assets</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding-top: 60px; }
+        .badge-shadow { background-color: #ffc107; color: #212529; }
+        .badge-approved { background-color: #198754; color: #fff; }
+        .badge-rejected { background-color: #dc3545; color: #fff; }
+        .table-hover tbody tr:hover { background-color: #f1f1f1; }
+        .version-badge {
+            font-size: 0.85em;
+            background-color: #6c757d;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand"
+           href="{% if session.get('role') == 'admin' %}
+                   {{ url_for('dashboard') }}
+                 {% else %}
+                   {{ url_for('analyst_dashboard') }}
+                 {% endif %}">
+            Shadow Assets
+        </a>
+
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <a class="btn btn-secondary mb-3"
+       href="{% if session.get('role') == 'admin' %}
+               {{ url_for('dashboard') }}
+             {% else %}
+               {{ url_for('analyst_dashboard') }}
+             {% endif %}">
+        ← Back to Dashboard
+    </a>
+
+    <h2>Shadow Assets</h2>
+    <p class="text-muted">
+        Assets detected outside approved inventory.
+    </p>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Main Domain</th>
+                <th>Type</th>
+                <th>Value</th>
+                <th>Version</th>
+                <th>Discovered By</th>
+                <th>Status</th>
+                {% if session.get('role') == 'admin' %}
+                    <th>Actions</th>
+                {% endif %}
+                <th>Created</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for shadow in shadows %}
+            <tr>
+                <td>{{ shadow.id }}</td>
+                <td>{{ shadow.asset.domain if shadow.asset else 'Orphan' }}</td>
+                <td>{{ shadow.asset_type|capitalize }}</td>
+                <td class="text-break">
+                    {% if shadow.asset_type in ['url', 'api_endpoint'] %}
+                        <a href="{{ shadow.value }}" target="_blank">{{ shadow.value }}</a>
+                    {% elif shadow.asset_type == 'email' %}
+                        <a href="mailto:{{ shadow.value }}">{{ shadow.value }}</a>
+                    {% else %}
+                        {{ shadow.value }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if shadow.version %}
+                        <span class="version-badge">{{ shadow.version }}</span>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>{{ shadow.discovered_by or "system" }}</td>
+
+                <td>
+                    {% if shadow.status == 'approved' %}
+                        <span class="badge badge-approved">Approved</span>
+                    {% elif shadow.status == 'rejected' %}
+                        <span class="badge badge-rejected">Rejected</span>
+                    {% else %}
+                        <span class="badge badge-shadow">Shadow</span>
+                    {% endif %}
+                </td>
+
+                {% if session.get('role') == 'admin' %}
+                <td>
+                    {% if shadow.status == 'shadow' %}
+                        <a href="{{ url_for('approve_shadow', item_id=shadow.id) }}"
+                           class="btn btn-success btn-sm">
+                            Approve
+                        </a>
+                        <a href="{{ url_for('reject_shadow', item_id=shadow.id) }}"
+                           class="btn btn-danger btn-sm">
+                            Reject
+                        </a>
+                    {% endif %}
+                </td>
+                {% endif %}
+
+                <td>{{ shadow.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if not shadows %}
+        <div class="alert alert-info">No shadow assets found.</div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

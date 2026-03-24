@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ASI Analyst Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0a0e12;
+            font-family: 'Inter', sans-serif;
+            padding-top: 80px;
+            color: #e0e4e8;
+        }
+        .navbar {
+            background-color: #0f1419 !important;
+            border-bottom: 1px solid #1e2a32;
+        }
+        .navbar-brand i {
+            color: #f68b1f;
+        }
+        .container {
+            max-width: 1600px;
+        }
+        .page-header {
+            margin-bottom: 1.5rem;
+        }
+        .page-header h2 {
+            font-weight: 400;
+            color: #fff;
+        }
+        .table {
+            background-color: transparent;
+            border-collapse: separate;
+            border-spacing: 0 4px;
+        }
+        .table thead th {
+            background-color: #1a232b;
+            color: #b6c2cd;
+            font-weight: 500;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            border: none;
+            padding: 0.75rem 1rem;
+        }
+        .table tbody tr {
+            background-color: #141b21;
+            transition: background-color 0.1s;
+        }
+        .table tbody tr:hover {
+            background-color: #1e2a32 !important;
+        }
+        .table td {
+            padding: 1rem 0.75rem;
+            border: none;
+            vertical-align: middle;
+        }
+        .domain-link {
+            font-weight: 500;
+            color: #f68b1f;
+            text-decoration: none;
+        }
+        .risk-badge {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.65rem;
+            border-radius: 20px;
+            background-color: #1f2a33;
+        }
+        .severity-pill {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.7rem;
+            border-radius: 20px;
+            background-color: #1f2a33;
+            margin-right: 3px;
+        }
+        .severity-pill i { margin-right: 3px; font-size: 0.6rem; }
+        .severity-critical { color: #ff5f5f; }
+        .severity-high { color: #ff9f4b; }
+        .severity-medium { color: #ffd351; }
+        .severity-low { color: #6bd4b2; }
+        .severity-info { color: #68a2cf; }
+        .btn-outline-shodan {
+            border: 1px solid #2c3a47;
+            color: #b6c2cd;
+            background: transparent;
+        }
+        .btn-outline-shodan:hover {
+            border-color: #f68b1f;
+            color: #f68b1f;
+            background-color: rgba(246,139,31,0.1);
+        }
+        .btn-shodan-primary {
+            background-color: #f68b1f;
+            border: none;
+            color: #0a0e12;
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-dot.completed { background-color: #3fb68b; }
+        .status-dot.running { background-color: #f6c445; animation: pulse 1.5s infinite; }
+        .status-dot.failed { background-color: #f05f5f; }
+        .status-dot.pending { background-color: #4e6679; }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .note-form textarea {
+            background-color: #1f2a33;
+            border: 1px solid #2c3a47;
+            color: #fff;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body data-bs-theme="dark">
+
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('analyst_dashboard') }}">
+            <i class="bi bi-shield-shaded"></i> ASI Analyst
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('attack_surface_intelligence') }}"><i class="bi bi-graph-up"></i> ASI Intel</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('view_shadows') }}"><i class="bi bi-exclamation-triangle"></i> Shadows</a></li>
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><span class="navbar-text me-3"><i class="bi bi-person-circle"></i> {{ session.get('username') }}</span></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="page-header">
+        <h2><i class="bi bi-eye"></i> Analyst Dashboard – Asset Overview</h2>
+        <p class="text-muted">Monitor scan progress, review vulnerabilities, and add notes to findings.</p>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table" id="assetTable">
+            <thead>
+
+                    <th>ID</th>
+                    <th>Domain</th>
+                    <th>Created</th>
+                    <th>Approved / Shadow</th>
+                    <th>Risk & Severity</th>
+                    <th>Scan Progress</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for asset in assets %}
+                {% set approved_count = approved_counts.get(asset.id, 0) %}
+                {% set shadow_count = shadow_counts.get(asset.id, 0) %}
+                {% set sev = severity_counts.get(asset.id, {}) %}
+                {% set last_scan = asset_scans.get(asset.id) %}
+
+                <tr data-asset-id="{{ asset.id }}">
+                    <td class="mono-data">#{{ asset.id }}</td>
+                    <td><a href="{{ url_for('asset_dashboard', asset_id=asset.id) }}" class="domain-link">{{ asset.domain }}</a></td>
+                    <td class="mono-data">{{ asset.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        <span class="badge bg-success">{{ approved_count }} Approved</span>
+                        <span class="badge bg-warning text-dark">{{ shadow_count }} Shadow</span>
+                    </td>
+                    <td id="risk-score-{{ asset.id }}">
+                        {% set score = asset.risk_score %}
+                        <span class="risk-badge">
+                            {% if score >= 80 %}🔥 Extreme{% elif score >= 50 %}💀 Severe{% elif score >= 20 %}⚠️ Critical{% elif score >= 10 %}⬆️ High{% elif score >= 5 %}➡️ Medium{% elif score > 0 %}⬇️ Low{% else %}⚪ None{% endif %}
+                            ({{ score }})
+                        </span><br>
+                        <span class="severity-pill"><i class="bi bi-circle-fill severity-critical"></i> C: {{ sev.get('critical', 0) }}</span>
+                        <span class="severity-pill"><i class="bi bi-circle-fill severity-high"></i> H: {{ sev.get('high', 0) }}</span>
+                        <span class="severity-pill"><i class="bi bi-circle-fill severity-medium"></i> M: {{ sev.get('medium', 0) }}</span>
+                        <span class="severity-pill"><i class="bi bi-circle-fill severity-low"></i> L: {{ sev.get('low', 0) }}</span>
+                        <span class="severity-pill"><i class="bi bi-circle-fill severity-info"></i> I: {{ sev.get('info', 0) }}</span>
+                    </td>
+                    <td>
+                        <div id="scan-status-{{ asset.id }}" class="mb-2">
+                            {% if last_scan %}
+                                <span class="status-dot {{ last_scan.status }}"></span>
+                                <span class="badge bg-{{ 'success' if last_scan.status == 'completed' else 'warning' if last_scan.status == 'running' else 'danger' if last_scan.status == 'failed' else 'secondary' }}">{{ last_scan.status }}</span>
+                            {% else %}
+                                <span class="status-dot pending"></span>
+                                <span class="badge bg-secondary">not_started</span>
+                            {% endif %}
+                        </div>
+                        <!-- Minimal tool status grid (optional) -->
+                        <div class="small text-muted">
+                            {% if last_scan %}
+                                subfinder: {{ last_scan.subfinder_status }} | httpx: {{ last_scan.httpx_status }} | nuclei: {{ last_scan.nuclei_status }}
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            {% if last_scan and last_scan.status != 'running' %}
+                                <a href="{{ url_for('scan_asset', asset_id=asset.id) }}" class="btn btn-sm btn-outline-shodan" title="Start Scan"><i class="bi bi-play-fill"></i></a>
+                            {% endif %}
+                            <a href="{{ url_for('view_report', asset_id=asset.id) }}" class="btn btn-sm btn-outline-shodan" title="Report"><i class="bi bi-file-text"></i></a>
+                            <a href="{{ url_for('view_vulnerabilities', asset_id=asset.id) }}" class="btn btn-sm btn-outline-shodan" title="Vulnerabilities"><i class="bi bi-bug"></i></a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function statusColorClass(status) {
+        if (status === 'done' || status === 'completed') return 'success';
+        if (status === 'running') return 'warning';
+        if (status === 'failed') return 'danger';
+        return 'secondary';
+    }
+
+    function updateScanStatus(assetId) {
+        fetch(`/api/scan-progress/${assetId}`)
+            .then(response => response.json())
+            .then(data => {
+                // Update status badge
+                const statusEl = document.getElementById(`scan-status-${assetId}`);
+                if (statusEl) {
+                    const badgeClass = data.status === 'completed' ? 'success' : (data.status === 'running' ? 'warning' : 'danger');
+                    statusEl.innerHTML = `<span class="status-dot ${data.status}"></span> <span class="badge bg-${badgeClass}">${data.status}</span>`;
+                }
+
+                // Update risk & severity
+                const riskTd = document.getElementById(`risk-score-${assetId}`);
+                if (riskTd && data.severity_counts) {
+                    const score = data.risk_score || 0;
+                    let html = `<span class="risk-badge">`;
+                    if (score >= 80) html += `🔥 Extreme (${score})`;
+                    else if (score >= 50) html += `💀 Severe (${score})`;
+                    else if (score >= 20) html += `⚠️ Critical (${score})`;
+                    else if (score >= 10) html += `⬆️ High (${score})`;
+                    else if (score >= 5) html += `➡️ Medium (${score})`;
+                    else if (score > 0) html += `⬇️ Low (${score})`;
+                    else html += `⚪ None (0)`;
+                    html += `</span><br>`;
+                    html += `<span class="severity-pill"><i class="bi bi-circle-fill severity-critical"></i> C: ${data.severity_counts.critical}</span>`;
+                    html += `<span class="severity-pill"><i class="bi bi-circle-fill severity-high"></i> H: ${data.severity_counts.high}</span>`;
+                    html += `<span class="severity-pill"><i class="bi bi-circle-fill severity-medium"></i> M: ${data.severity_counts.medium}</span>`;
+                    html += `<span class="severity-pill"><i class="bi bi-circle-fill severity-low"></i> L: ${data.severity_counts.low}</span>`;
+                    html += `<span class="severity-pill"><i class="bi bi-circle-fill severity-info"></i> I: ${data.severity_counts.info}</span>`;
+                    riskTd.innerHTML = html;
+                }
+            })
+            .catch(err => console.error(`Error updating asset ${assetId}:`, err));
+    }
+
+    // Poll every 5 seconds for assets that are running
+    setInterval(() => {
+        document.querySelectorAll("[data-asset-id]").forEach(row => {
+            const assetId = row.dataset.assetId;
+            const statusEl = document.getElementById(`scan-status-${assetId}`);
+            if (statusEl && statusEl.innerText.includes('running')) {
+                updateScanStatus(assetId);
+            }
+        });
+    }, 5000);
+
+    // Initial update for all assets (to get current status)
+    document.querySelectorAll("[data-asset-id]").forEach(row => updateScanStatus(row.dataset.assetId));
+</script>
+</body>
+</html>

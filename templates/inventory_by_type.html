@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ asset_type|capitalize }} Inventory</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            background: #0a0e1a;
+            color: #eaeaea;
+            padding-top: 60px;
+        }
+
+        .navbar {
+            background: #141b2b;
+            border-bottom: 2px solid #00ff9d;
+        }
+
+        .card {
+            background: #141b2b;
+            border: 1px solid #1e2a3a;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background: #1a2335;
+            border-bottom: 1px solid #00ff9d;
+            color: #00ff9d;
+            font-weight: bold;
+        }
+
+        .table {
+            color: #eaeaea;
+        }
+
+        .table thead th {
+            border-bottom-color: #00ff9d;
+            color: #00ff9d;
+        }
+
+        .table td {
+            border-color: #1e2a3a;
+        }
+
+        .badge-approved { background-color: #198754; }
+        .badge-shadow { background-color: #ffc107; color: #212529; }
+
+        .type-icon {
+            font-size: 2rem;
+            margin-right: 10px;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, #141b2b, #1a2335);
+            border-left: 4px solid #00ff9d;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('attack_surface_intelligence') }}">
+                <i class="bi bi-arrow-left"></i> Back to ASI
+            </a>
+            <span class="navbar-text text-light">
+                {{ asset_type|capitalize }} Inventory ({{ count }} total)
+            </span>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-4">
+        <!-- Stats -->
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <i class="bi {{ icon_map.get(asset_type, 'bi-grid-3x3-gap-fill') }} type-icon"></i>
+                    <h3>{{ count }}</h3>
+                    <small>Total {{ asset_type|capitalize }}s</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <i class="bi bi-check-circle-fill text-success type-icon"></i>
+                    <h3>{{ inventory|selectattr('status', 'equalto', 'approved')|list|length }}</h3>
+                    <small>Approved</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <i class="bi bi-exclamation-triangle-fill text-warning type-icon"></i>
+                    <h3>{{ inventory|selectattr('status', 'equalto', 'shadow')|list|length }}</h3>
+                    <small>Shadow</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <i class="bi bi-diagram-2 text-info type-icon"></i>
+                    <h3>{{ by_asset|length }}</h3>
+                    <small>Parent Assets</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-list"></i> All {{ asset_type|capitalize }}s
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Value</th>
+                                        {% if asset_type in ['service', 'technology'] %}
+                                        <th>Version</th>
+                                        {% endif %}
+                                        <th>Parent Asset</th>
+                                        <th>Status</th>
+                                        <th>Discovered By</th>
+                                        <th>Created At</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in inventory %}
+                                    <tr>
+                                        <td>
+                                            {% if asset_type == 'url' or asset_type == 'api_endpoint' %}
+                                                <a href="{{ item.value }}" target="_blank" class="text-info">{{ item.value[:50] }}{% if item.value|length > 50 %}...{% endif %}</a>
+                                            {% elif asset_type == 'domain' %}
+                                                <a href="http://{{ item.value }}" target="_blank" class="text-info">{{ item.value }}</a>
+                                            {% elif asset_type == 'email' %}
+                                                <a href="mailto:{{ item.value }}" class="text-info">{{ item.value }}</a>
+                                            {% else %}
+                                                {{ item.value }}
+                                            {% endif %}
+                                        </td>
+                                        {% if asset_type in ['service', 'technology'] %}
+                                        <td>{{ item.version if item.version else '-' }}</td>
+                                        {% endif %}
+                                        <td>
+                                            {% set asset = item.asset %}
+                                            {% if asset %}
+                                                <a href="{{ url_for('asset_dashboard', asset_id=asset.id) }}" class="text-success">
+                                                    {{ asset.domain }}
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if item.status == 'approved' %}
+                                                <span class="badge badge-approved">Approved</span>
+                                            {% else %}
+                                                <span class="badge badge-shadow">Shadow</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ item.discovered_by }}</td>
+                                        <td>{{ item.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>
+                                            {% if session.get('role') == 'admin' and item.status == 'shadow' %}
+                                            <a href="{{ url_for('approve_shadow', item_id=item.id) }}" class="btn btn-sm btn-success" title="Approve">
+                                                <i class="bi bi-check-lg"></i>
+                                            </a>
+                                            <a href="{{ url_for('reject_shadow', item_id=item.id) }}" class="btn btn-sm btn-danger" title="Reject">
+                                                <i class="bi bi-x-lg"></i>
+                                            </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grouped by Asset -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-diagram-2"></i> Grouped by Parent Asset
+                    </div>
+                    <div class="card-body">
+                        {% for asset_name, items in by_asset.items() %}
+                        <div class="mb-4">
+                            <h5 class="text-info">{{ asset_name }} <span class="badge bg-secondary">{{ items|length }}</span></h5>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Value</th>
+                                            {% if asset_type in ['service', 'technology'] %}
+                                            <th>Version</th>
+                                            {% endif %}
+                                            <th>Status</th>
+                                            <th>Discovered</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in items %}
+                                        <tr>
+                                            <td>{{ item.value }}</td>
+                                            {% if asset_type in ['service', 'technology'] %}
+                                            <td>{{ item.version if item.version else '-' }}</td>
+                                            {% endif %}
+                                            <td>
+                                                {% if item.status == 'approved' %}
+                                                    <span class="badge bg-success">Approved</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning text-dark">Shadow</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ item.created_at.strftime('%Y-%m-%d') }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Optional: you can add any JavaScript here if needed.
+    </script>
+</body>
+</html>

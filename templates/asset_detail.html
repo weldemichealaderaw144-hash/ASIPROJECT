@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Asset Detail - {{ asset.domain }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding: 20px; background: #f8f9fa; }
+        .nav-tabs .nav-link { color: #495057; }
+        .nav-tabs .nav-link.active { font-weight: bold; background-color: #e9ecef; }
+        .table td, .table th { vertical-align: middle; }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+
+<h2>Asset: {{ asset.domain }}</h2>
+<p><strong>Created:</strong> {{ asset.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+
+<hr>
+
+<!-- Tabs Navigation -->
+<ul class="nav nav-tabs" id="assetTabs" role="tablist">
+
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="subdomains-tab" data-bs-toggle="tab" data-bs-target="#subdomains" type="button" role="tab">Subdomains</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="urls-tab" data-bs-toggle="tab" data-bs-target="#urls" type="button" role="tab">URLs</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="ips-tab" data-bs-toggle="tab" data-bs-target="#ips" type="button" role="tab">IPs</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="ports-tab" data-bs-toggle="tab" data-bs-target="#ports" type="button" role="tab">Ports</button>
+  </li>
+  <!-- New Professional Asset Types -->
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="services-tab" data-bs-toggle="tab" data-bs-target="#services" type="button" role="tab">Services</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="technologies-tab" data-bs-toggle="tab" data-bs-target="#technologies" type="button" role="tab">Technologies</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="emails-tab" data-bs-toggle="tab" data-bs-target="#emails" type="button" role="tab">Emails</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="cloud-tab" data-bs-toggle="tab" data-bs-target="#cloud" type="button" role="tab">Cloud Assets</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="api-tab" data-bs-toggle="tab" data-bs-target="#api" type="button" role="tab">API Endpoints</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="shadow-tab" data-bs-toggle="tab" data-bs-target="#shadow" type="button" role="tab">Shadow Assets</button>
+  </li>
+</ul>
+
+<!-- Tabs Content -->
+<div class="tab-content mt-3" id="assetTabsContent">
+
+  <!-- Subdomains Tab -->
+  <div class="tab-pane fade show active" id="subdomains" role="tabpanel">
+    <table class="table table-bordered table-striped">
+      <thead class="table-dark">
+        <tr><th>ID</th><th>Value</th><th>Status</th><th>Discovered By</th></tr>
+      </thead>
+      <tbody>
+        {% for item in inventory if item.asset_type=='subdomain' %}
+        <tr>
+          <td>{{ item.id }}</td>
+          <td>{{ item.value }}</td>
+          <td>
+            {% if item.status=='approved' %}<span class="badge bg-success">Approved</span>{% elif item.status=='shadow' %}<span class="badge bg-warning text-dark">Shadow</span>{% else %}<span class="badge bg-danger">Rejected</span>{% endif %}
+          </td>
+          <td>{{ item.discovered_by }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center text-muted">No subdomains found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- URLs Tab -->
+  <div class="tab-pane fade" id="urls" role="tabpanel">
+    <table class="table table-bordered table-striped">
+      <thead class="table-dark"><tr><th>ID</th><th>URL</th><th>Status</th><th>Discovered By</th></tr></thead>
+      <tbody>
+        {% for item in inventory if item.asset_type=='url' %}
+        <tr>
+          <td>{{ item.id }}</td>
+          <td><a href="{{ item.value }}" target="_blank">{{ item.value }}</a></td>
+          <td>
+            {% if item.status=='approved' %}<span class="badge bg-success">Approved</span>{% elif item.status=='shadow' %}<span class="badge bg-warning text-dark">Shadow</span>{% else %}<span class="badge bg-danger">Rejected</span>{% endif %}
+          </td>
+          <td>{{ item.discovered_by }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center text-muted">No URLs found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- IPs Tab -->
+  <div class="tab-pane fade" id="ips" role="tabpanel">
+    <table class="table table-bordered table-striped">
+      <thead class="table-dark"><tr><th>ID</th><th>IP</th><th>Status</th><th>Discovered By</th></tr></thead>
+      <tbody>
+        {% for item in inventory if item.asset_type=='ip' %}
+        <tr>
+          <td>{{ item.id }}</td>
+          <td>{{ item.value }}</td>
+          <td>
+            {% if item.status=='approved' %}<span class="badge bg-success">Approved</span>{% elif item.status=='shadow' %}<span class="badge bg-warning text-dark">Shadow</span>{% else %}<span class="badge bg-danger">Rejected</span>{% endif %}
+          </td>
+          <td>{{ item.discovered_by }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center text-muted">No IPs found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Ports Tab -->
+  <div class="tab-pane fade" id="ports" role="tabpanel">
+    <table class="table table-bordered table-striped">
+      <thead class="table-dark"><tr><th>ID</th><th>Port</th><th>Status</th><th>Discovered By</th></tr></thead>
+      <tbody>
+        {% for item in inventory if item.asset_type=='port' %}
+        <tr>
+          <td>{{ item.id }}</td>
+          <td>{{ item.value }}</td>
+          <td>
+            {% if item.status=='approved' %}<span class="badge bg-success">Approved</span>{% elif item.status=='shadow' %}<span class="badge bg-warning text-dark">Shadow</span>{% else %}<span class="badge bg-danger">Rejected</span>{% endif %}
+          </td>
+          <td>{{ item.discovered_by }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center text-muted">No ports found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Services Tab -->
+  <div class="tab-pane fade" id="services" role="tabpanel">
+    <table class="table table-bordered table-striped">
+      <thead class="table-dark"><tr><th>ID</th><th>Service</th><th>Version</th><th>Status</th><th>Discovered By</th></tr></thead>
+      <tbody>
+        {% for item in inventory if item.asset_type=='service' %}
+        <tr>
+          <td>{{ item.id }}</td>
+          <td>{{ item.value }}</td>
+          <td>{{ item.version if item.version else '-' }}</td>
+          <td>
+            {% if item.status=='approved' %}<span class="badge bg-success">Approved</span>{% elif item.status=='shadow' %}<span class="badge bg-warning text-dark">Shadow</span>{% else %}<span class="badge bg-danger">Rejected</span>{% endif %}
+          </td>
+          <td>{{ item.discovered_by }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center text-muted">No services found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Technologies Tab -->
+  <div class="tab-pane fade" id="technologies" role="tabpanel">
+    <table class="table table-bordered table-striped">
+      <thead class="table-dark"><tr><th>ID</th><th>Technology</th><th>Version</th><th>Status</th><th>Discovered By</th></tr></thead>
+      <tbody>
+        {% for item in inventory if item.asset_type=='technology' %}
+        <tr>
+          <td>{{ item.id }}</td>
+          <td>{{ item.value }}</td>
+          <td>{{ item.version if item.version else '-' }}</td>
+          <td>
+            {% if item.status=='approved' %}<span class="badge bg-success">Approved</span>{% elif item.status=='shadow' %}<span class="badge bg-warning text-dark">Shadow</span>{% else %}<span class="badge bg-danger">Rejected</span>{% endif %}
+          </td>
+          <td>{{ item.discovered_by }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center text-muted">No technologies found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Emails Tab -->
+  <div class="tab-pane fade" id="emails" role="tabpanel">
+    <table class="table table-bordered table-striped">
+      <thead class="table-dark"><tr><th>ID</th><th>Email</th><th>Status</th><th>Discovered By</th></tr></thead>
+      <tbody>
+        {% for item in inventory if item.asset_type=='email' %}
+        <tr>
+          <td>{{ item.id }}</td>
+          <td>{{ item.value }}</td>
+          <td>
+            {% if item.status=='approved' %}<span class="badge bg-success">Approved</span>{% elif item.status=='shadow' %}<span class="badge bg-warning text-dark">Shadow</span>{% else %}<span class="badge bg-danger">Rejected</span>{% endif %}
+          </td>
+          <td>{{ item.discovered_by }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center text-muted">No emails found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Cloud Assets Tab -->
+  <div class="tab-pane fade" id="cloud" role="tabpanel">
+    <table class="table table-bordered table-striped">
+      <thead class="table-dark"><tr><th>ID</th><th>Cloud Asset</th><th>Status</th><th>Discovered By</th></tr></thead>
+      <tbody>
+        {% for item in inventory if item.asset_type=='cloud_asset' %}
+        <tr>
+          <td>{{ item.id }}</td>
+          <td>{{ item.value }}</td>
+          <td>
+            {% if item.status=='approved' %}<span class="badge bg-success">Approved</span>{% elif item.status=='shadow' %}<span class="badge bg-warning text-dark">Shadow</span>{% else %}<span class="badge bg-danger">Rejected</span>{% endif %}
+          </td>
+          <td>{{ item.discovered_by }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center text-muted">No cloud assets found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- API Endpoints Tab -->
+  <div class="tab-pane fade" id="api" role="tabpanel">
+    <table class="table table-bordered table-striped">
+      <thead class="table-dark"><tr><th>ID</th><th>API Endpoint</th><th>Status</th><th>Discovered By</th></tr></thead>
+      <tbody>
+        {% for item in inventory if item.asset_type=='api_endpoint' %}
+        <tr>
+          <td>{{ item.id }}</td>
+          <td><a href="{{ item.value }}" target="_blank">{{ item.value }}</a></td>
+          <td>
+            {% if item.status=='approved' %}<span class="badge bg-success">Approved</span>{% elif item.status=='shadow' %}<span class="badge bg-warning text-dark">Shadow</span>{% else %}<span class="badge bg-danger">Rejected</span>{% endif %}
+          </td>
+          <td>{{ item.discovered_by }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center text-muted">No API endpoints found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Shadow Assets Tab (all shadow items regardless of type) -->
+  <div class="tab-pane fade" id="shadow" role="tabpanel">
+    <table class="table table-bordered table-striped table-hover">
+      <thead class="table-dark"><tr><th>ID</th><th>Type</th><th>Value</th><th>Discovered By</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for item in inventory if item.status=='shadow' %}
+        <tr>
+          <td>{{ item.id }}</td>
+          <td>{{ item.asset_type }}</td>
+          <td>{{ item.value }}</td>
+          <td>{{ item.discovered_by }}</td>
+          <td>
+            <a href="{{ url_for('approve_shadow', item_id=item.id) }}" class="btn btn-success btn-sm">Approve</a>
+            <a href="{{ url_for('reject_shadow', item_id=item.id) }}" class="btn btn-danger btn-sm">Reject</a>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center text-muted">No shadow assets pending.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<a href="{{ url_for('dashboard') }}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
