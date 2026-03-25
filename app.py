@@ -1749,6 +1749,8 @@ def register_routes(app):
         findings = run_nuclei(asset, [test_url])
         return jsonify({"asset_id": asset.id, "domain": asset.domain, "findings_count": len(findings), "findings": findings[:10]})
 
+from werkzeug.security import generate_password_hash
+
 def create_default_users():
     if User.query.count() == 0:
         admin_pw = "admin"
@@ -1773,6 +1775,7 @@ def create_default_users():
         print("Default users created.")
         print(f"Admin password: {admin_pw}")
         print(f"Analyst password: {analyst_pw}")
+
 # ================= MAIN =================
 if __name__ == "__main__":
     app = create_app()
