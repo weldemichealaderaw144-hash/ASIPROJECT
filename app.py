@@ -1734,6 +1734,7 @@ def register_routes(app):
                                services=services, technologies=technologies, emails=emails, cloud=cloud, apis=apis,
                                shadow=shadow, approved=approved)
 
+    # ------------------ FIXED test_nuclei route ------------------
     @app.route("/test-nuclei/<path:test_url>")
     @login_required
     @role_required("admin")
@@ -1748,8 +1749,6 @@ def register_routes(app):
             db.session.commit()
         findings = run_nuclei(asset, [test_url])
         return jsonify({"asset_id": asset.id, "domain": asset.domain, "findings_count": len(findings), "findings": findings[:10]})
-
-from werkzeug.security import generate_password_hash
 
 def create_default_users():
     if User.query.count() == 0:
