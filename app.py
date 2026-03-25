@@ -1751,17 +1751,28 @@ def register_routes(app):
 
 def create_default_users():
     if User.query.count() == 0:
-        admin_pw = os.urandom(12).hex()
-        analyst_pw = os.urandom(12).hex()
-        admin = User(username="admin", password=generate_password_hash(admin_pw), role="admin")
-        analyst = User(username="analyst", password=generate_password_hash(analyst_pw), role="analyst")
+        admin_pw = "admin"
+        analyst_pw = "analyst"
+
+        admin = User(
+            username="admin",
+            password=generate_password_hash(admin_pw),
+            role="admin"
+        )
+
+        analyst = User(
+            username="analyst",
+            password=generate_password_hash(analyst_pw),
+            role="analyst"
+        )
+
         db.session.add(admin)
         db.session.add(analyst)
         db.session.commit()
-        print(f"Default users created.")
+
+        print("Default users created.")
         print(f"Admin password: {admin_pw}")
         print(f"Analyst password: {analyst_pw}")
-
 # ================= MAIN =================
 if __name__ == "__main__":
     app = create_app()
