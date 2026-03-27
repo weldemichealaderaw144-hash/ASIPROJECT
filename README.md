@@ -157,16 +157,7 @@ API Endpoints
 * SOC Monitoring
 * Asset Inventory
 
----
-
-## 🚧 Future Plans
-
-* Web Dashboard (Flask / React)
-* Risk Scoring System
-* Automation Pipeline
-* Cloud Asset Discovery
-
----
+----
 
 ## 👨‍💻 Author
 
