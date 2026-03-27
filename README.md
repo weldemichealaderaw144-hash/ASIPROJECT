@@ -1,180 +1,107 @@
-# ASIPROJECT
-ASI Project
-# ASIPROJECT – Reconnaissance Toolkit
+ASIPROJECT
+Attack Surface Intelligence Platform
 
-A curated collection of powerful reconnaissance and bug‑bounty tools, packaged together for easy installation and use on **Kali Linux** and **Windows**.  
+ASI Project የሳይበር ደህንነት (Cyber Security) መረጃ ማሰባሰቢያ ፕላትፎርም ነው፤ በተለይም reconnaissance እና bug bounty ስራዎች ላይ የሚያግዝ።
 
-Includes:
+It is a curated toolkit designed for security researchers, bug hunters, and SOC analysts to automate asset discovery and vulnerability detection.
 
-- [subfinder](https://github.com/projectdiscovery/subfinder) – fast subdomain enumeration  
-- [amass](https://github.com/OWASP/Amass) – in‑depth attack surface mapping  
-- [assetfinder](https://github.com/tomnomnom/assetfinder) – find domains and subdomains  
-- [dnsx](https://github.com/projectdiscovery/dnsx) – fast and multi‑purpose DNS toolkit  
-- [httpx](https://github.com/projectdiscovery/httpx) – HTTP probing and information gathering  
-- [katana](https://github.com/projectdiscovery/katana) – next‑generation crawling and spidering  
-- [gau](https://github.com/lc/gau) – get all URLs (AlienVault’s Open Threat Exchange)  
-- [nuclei](https://github.com/projectdiscovery/nuclei) – fast vulnerability scanner  
-- [gowitness](https://github.com/sensepost/gowitness) – web screenshot utility *(pending)*  
-- [whatweb](https://github.com/urbanadventurer/WhatWeb) – web technology fingerprinting  
-- [theHarvester](https://github.com/laramies/theHarvester) – email, domain, and subdomain enumeration  
-- [wappalyzer](https://github.com/AliasIO/wappalyzer) – technology stack detection  
+🔧 Tools Included (መሳሪያዎች)
+Tool	Description
+subfinder	ፈጣን subdomain enumeration
+amass	Advanced attack surface mapping
+assetfinder	Domain & subdomain discovery
+dnsx	DNS resolution toolkit
+httpx	HTTP probing & service detection
+katana	Web crawling & spidering
+gau	Historical URL collection
+nuclei	Vulnerability scanning (templates-based)
+gowitness	Web screenshots (pending)
+whatweb	Technology fingerprinting
+theHarvester	Emails & OSINT gathering
+wappalyzer	Tech stack detection
+⚙️ Prerequisites (ቅድመ ሁኔታ)
 
----
+Ensure you have the following installed:
 
-## Prerequisites
-
-- **Go** (for tools written in Go)  
-- **Python** (for theHarvester and WhatWeb)  
-- **Git** (to clone the repository)  
-
-### Install Go
-
-#### Kali Linux
-```bash
+Go → for most tools
+Python → for OSINT tools
+Git → to clone repository
+Node.js (npm) → for Wappalyzer
+🐧 Installation – Kali Linux
 sudo apt update
-sudo apt install golang-go
-sudo apt install python3 python3-pip
-most tools are installed using go.....
+sudo apt install golang-go python3 python3-pip git npm -y
+Install Tools (በ Go)
 go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
-
-# Amass
 go install -v github.com/OWASP/Amass/v3/...@master
-
-# Assetfinder
 go install github.com/tomnomnom/assetfinder@latest
-
-# Dnsx
 go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest
-
-# Httpx
 go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
-
-# Katana
 go install github.com/projectdiscovery/katana/cmd/katana@latest
-
-# Gau
 go install github.com/lc/gau/v2/cmd/gau@latest
-
-# Nuclei
 go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
-
-# Gowitness (pending – install anyway)
 go install github.com/sensepost/gowitness@latest
-
-# WhatWeb
-sudo apt install whatweb
-
-# theHarvester
-sudo apt install theharvester
-
-# Wappalyzer (requires Node.js)
-sudo apt install npm
+Other Tools
+sudo apt install whatweb theharvester -y
 npm install -g wappalyzer
-After installation, ensure that $HOME/go/bin is in your PATH:echo 'export PATH=$PATH:$HOME/go/bin' >> ~/.bashrc
+Fix PATH
+echo 'export PATH=$PATH:$HOME/go/bin' >> ~/.bashrc
 source ~/.bashrc
-
-
-------------------------------------------
-in Windows
-Install Go (see prerequisites) and make sure %GOPATH%\bin is in your PATH.
-
-Open a Command Prompt (or PowerShell) and run the following:
-:: Subfinder
+🪟 Installation – Windows
+Install Go and set PATH (%GOPATH%\bin)
+Open PowerShell / CMD
 go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
-
-:: Amass
 go install -v github.com/OWASP/Amass/v3/...@master
-
-:: Assetfinder
 go install github.com/tomnomnom/assetfinder@latest
-
-:: Dnsx
 go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest
-
-:: Httpx
 go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
-
-:: Katana
 go install github.com/projectdiscovery/katana/cmd/katana@latest
-
-:: Gau
 go install github.com/lc/gau/v2/cmd/gau@latest
-
-:: Nuclei
 go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
-
-:: Gowitness (pending)
 go install github.com/sensepost/gowitness@latest
+Optional (Recommended)
 
+👉 Use WSL2 + Kali Linux for better compatibility
 
-For WhatWeb and theHarvester, you can use WSL (Windows Subsystem for Linux) or install them via Git and Python manually:
-
-WhatWeb:
-
-cmd
-git clone https://github.com/urbanadventurer/WhatWeb.git
-cd WhatWeb
-gem install bundler
-bundle install
-Then run with ruby whatweb.rb.
-
-theHarvester:
-
-cmd
-git clone https://github.com/laramies/theHarvester.git
-cd theHarvester
-pip install -r requirements.txt
-Run with python theHarvester.py.
-
-
-Wappalyzer:
-
-cmd
-npm install -g wappalyzer
-Tip: For a smoother experience on Windows, consider using WSL2 with a Kali distribution – then you can follow the Kali instructions
-
------------------------------------
-
-
-Subfinder
-bash
+▶️ Usage Examples (አጠቃቀም)
+# Subdomain discovery
 subfinder -d example.com -silent
-Amass
-bash
+
+# Attack surface mapping
 amass enum -d example.com
-Assetfinder
-bash
-assetfinder --subs-only example.com
-Dnsx
-bash
-# Resolve subdomains from a file
-cat subdomains.txt | dnsx -a -resp
-Httpx
-bash
-# Probe live hosts from subdomains
-cat subdomains.txt | httpx -status-code -title -tech-detect
-Katana
-bash
-# Crawl a domain
-katana -u https://example.com
-Gau
-bash
-# Get URLs from historical data
+
+# Find URLs
 gau example.com
-Nuclei
-bash
-# Run templates on a target
+
+# Probe live hosts
+cat subdomains.txt | httpx -status-code -title
+
+# Scan vulnerabilities
 nuclei -u https://example.com -t cves/
-Gowitness (pending)
-bash
-# Take screenshots from a list of URLs
-gowitness file -f urls.txt
-WhatWeb
-bash
-whatweb https://example.com
-theHarvester
-bash
-theHarvester -d example.com -b all
-Wappalyzer
-bash
-wappalyzer https://example.com
+🧠 ASI Concept (ምንድነው ASI?)
+
+Attack Surface Intelligence (ASI) ማለት:
+
+👉 የአንድ organization ያሉትን
+
+Domains
+Subdomains
+IPs
+APIs
+Services
+
+መሰብሰብ፣ መቆጣጠር እና አደጋ (risk) መገምገም ነው።
+
+🔐 Use Cases
+Bug Bounty Hunting
+Red Team Reconnaissance
+SOC Monitoring
+Asset Inventory Management
+📌 Future Improvements
+Web Dashboard (Flask / React)
+Risk Scoring System
+Automation Pipelines
+Cloud Asset Detection
+👨‍💻 Author
+
+Weldemicheal (Ethiopia 🇪🇹)
+Cyber Security Enthusiast | ASI Developer
