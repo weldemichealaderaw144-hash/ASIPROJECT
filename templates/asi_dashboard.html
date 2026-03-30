@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASI</title>
+    <title>ASI - Attack Surface Intelligence</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -22,6 +22,12 @@
             --warning: #f6c445;
             --danger: #f05f5f;
             --info: #68a2cf;
+            --extreme: #8B0000;
+            --severe: #DC143C;
+            --critical: #e74c3c;
+            --high: #e67e22;
+            --medium: #f1c40f;
+            --low: #3498db;
         }
 
         body {
@@ -68,13 +74,19 @@
             margin-bottom: 2rem;
             border-bottom: 2px solid var(--primary);
         }
-        .dashboard-header h1 {
+        .dashboard-header h2 {
             font-weight: 400;
             color: #fff;
             letter-spacing: -0.5px;
         }
-        .dashboard-header h1 i {
+        .dashboard-header h2 i {
             color: var(--primary);
+        }
+        .dashboard-header h2 small {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            margin-left: 10px;
         }
 
         .filter-bar {
@@ -182,6 +194,7 @@
             color: var(--primary);
             font-weight: 400;
             letter-spacing: -0.3px;
+            margin-bottom: 1rem;
         }
 
         .table {
@@ -263,6 +276,24 @@
             background-color: #1f2a33;
             font-weight: 500;
             display: inline-block;
+            white-space: nowrap;
+        }
+
+        .risk-badge-extreme { background-color: var(--extreme); color: #fff; }
+        .risk-badge-severe { background-color: var(--severe); color: #fff; }
+        .risk-badge-critical { background-color: var(--critical); color: #fff; }
+        .risk-badge-high { background-color: var(--high); color: #000; }
+        .risk-badge-medium { background-color: var(--medium); color: #000; }
+        .risk-badge-low { background-color: var(--low); color: #fff; }
+        .risk-badge-none { background-color: #95a5a6; color: #000; }
+
+        .risk-progress {
+            width: 80px;
+            margin-top: 4px;
+        }
+        .risk-progress .progress {
+            height: 4px;
+            background-color: #2c3e50;
         }
 
         .quick-actions {
@@ -301,8 +332,28 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+
         a.text-info {
             color: var(--info) !important;
+        }
+
+        .risk-trend-up { color: var(--danger); }
+        .risk-trend-down { color: var(--success); }
+        .risk-trend-stable { color: var(--text-secondary); }
+
+        .vulnerability-badge {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 12px;
+            margin-right: 3px;
+        }
+        .vuln-critical { background-color: var(--extreme); }
+        .vuln-high { background-color: var(--severe); }
+        .vuln-medium { background-color: var(--medium); color: #000; }
+
+        .hover-tooltip {
+            cursor: help;
+            border-bottom: 1px dotted var(--text-secondary);
         }
     </style>
 </head>
@@ -375,8 +426,9 @@
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h2>የጥቃት መድረክ <small>ንብረቶች · መረጃ ትንተና</small></h2>
-
+                    <h2><i class="bi bi-shield-shaded"></i> Attack Surface Intelligence
+                        <small>Assets · Risk Analysis · Discovery</small>
+                    </h2>
                 </div>
                 <div class="col-md-4 text-end">
                     <button class="btn btn-outline-shodan me-2" onclick="refreshStats()">
@@ -392,17 +444,27 @@
 
     <!-- Main Content -->
     <div class="container-fluid px-4">
-        <!-- Filter bar (optional) -->
+        <!-- Filter bar -->
         <div class="filter-bar">
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                 <input type="text" class="form-control" placeholder="Filter assets by name, type, or value..." id="assetFilter">
             </div>
+            <select class="form-select w-auto" id="riskFilter" style="background-color: var(--bg-dark); border-color: var(--border-color);">
+                <option value="all">All Risk Levels</option>
+                <option value="extreme">Extreme (80+)</option>
+                <option value="severe">Severe (50-79)</option>
+                <option value="critical">Critical (20-49)</option>
+                <option value="high">High (10-19)</option>
+                <option value="medium">Medium (5-9)</option>
+                <option value="low">Low (1-4)</option>
+                <option value="none">None (0)</option>
+            </select>
             <button class="btn btn-shodan-primary" type="button" id="filterBtn"><i class="bi bi-funnel"></i> Apply</button>
         </div>
 
-        <!-- Stats Cards -->
-        <div class="row g-4">
+        <!-- Stats Cards Row 1 -->
+        <div class="row g-4 mb-4">
             <div class="col-md-3">
                 <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-building"></i></div>
@@ -437,8 +499,53 @@
             </div>
         </div>
 
-        <!-- Additional stats row for new types -->
-        <div class="row g-4 mt-2">
+        <!-- Stats Cards Row 2 - Risk Focused -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-graph-up"></i></div>
+                    <div class="stat-value">{{ "%.1f"|format(avg_risk_score) }}</div>
+                    <div class="stat-label">Average Risk Score</div>
+                    <div class="stat-small">
+                        {% set high_risk_count = assets|selectattr('risk_score', '>=', 50)|list|length %}
+                        {{ high_risk_count }} assets at high risk
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-bug"></i></div>
+                    <div class="stat-value">{{ total_vulnerabilities }}</div>
+                    <div class="stat-label">Total Vulnerabilities</div>
+                    <div class="stat-small">{{ critical_vulns }} critical, {{ high_vulns }} high</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-arrow-up-short"></i></div>
+                    <div class="stat-value">{{ max_risk_score }}</div>
+                    <div class="stat-label">Highest Risk Score</div>
+                    <div class="stat-small">
+                        {% if max_risk_asset %}
+                            <a href="{{ url_for('asset_dashboard', asset_id=max_risk_asset.id) }}" class="text-info text-decoration-none">
+                                {{ max_risk_asset.domain }}
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-shield-check"></i></div>
+                    <div class="stat-value">{{ low_risk_count }}</div>
+                    <div class="stat-label">Low Risk Assets</div>
+                    <div class="stat-small">Score 1-9</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional stats row for asset types -->
+        <div class="row g-4 mb-4">
             <div class="col-md-2">
                 <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-hdd"></i></div>
@@ -476,14 +583,21 @@
             </div>
             <div class="col-md-2">
                 <div class="stat-card">
-                    <div class="stat-icon"><i class="bi bi-shield"></i></div>
+                    <div class="stat-icon"><i class="bi bi-plug"></i></div>
                     <div class="stat-value">{{ ports_count }}</div>
                     <div class="stat-label">Open Ports</div>
                 </div>
             </div>
         </div>
 
-
+        <!-- Charts Row -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5><i class="bi bi-pie-chart"></i> Asset Type Distribution</h5>
+                    <div id="typeChart"></div>
+                </div>
+            </div>
             <div class="col-md-6">
                 <div class="chart-container">
                     <h5><i class="bi bi-check-circle"></i> Status Distribution</h5>
@@ -495,68 +609,136 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="chart-container">
-                    <h5><i class="bi bi-exclamation-triangle"></i> Risk Distribution</h5>
+                    <h5><i class="bi bi-exclamation-triangle"></i> Risk Score Distribution</h5>
                     <div id="riskChart"></div>
                 </div>
             </div>
-
-
-        <!-- Top Risk Assets & Asset Breakdown -->
-        <div class="row mt-4">
             <div class="col-md-6">
+                <div class="chart-container">
+                    <h5><i class="bi bi-calendar-week"></i> Discovery Timeline (Last 30 Days)</h5>
+                    <div id="timelineChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Risk Assets Section -->
+        <div class="row mt-4">
+            <div class="col-md-12">
                 <div class="chart-container">
                     <h5 class="mb-3"><i class="bi bi-exclamation-triangle-fill text-danger"></i> Top Risk Assets</h5>
                     <div class="table-responsive">
-                        <table class="table">
+                        <table class="table" id="topRiskTable">
                             <thead>
-
+                                <tr>
                                     <th>Domain</th>
                                     <th>Risk Score</th>
+                                    <th>Risk Level</th>
+                                    <th>Vulnerabilities</th>
+                                    <th>Assets Found</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for asset in top_risk_assets %}
-                                <tr>
+                                <tr data-risk-score="{{ asset.risk_score }}">
                                     <td>
                                         <a href="{{ url_for('asset_dashboard', asset_id=asset.id) }}" class="text-info text-decoration-none">
-                                            {{ asset.domain }}
+                                            <i class="bi bi-box-arrow-up-right"></i> {{ asset.domain }}
                                         </a>
                                     </td>
                                     <td>
-                                        <span class="risk-badge">
-                                            {% if asset.risk_score >= 80 %}
-                                                🔥 Extreme ({{ asset.risk_score }})
-                                            {% elif asset.risk_score >= 50 %}
-                                                💀 Severe ({{ asset.risk_score }})
-                                            {% elif asset.risk_score >= 20 %}
-                                                ⚠️ Critical ({{ asset.risk_score }})
-                                            {% elif asset.risk_score >= 10 %}
-                                                ⬆️ High ({{ asset.risk_score }})
-                                            {% elif asset.risk_score >= 5 %}
-                                                ➡️ Medium ({{ asset.risk_score }})
-                                            {% elif asset.risk_score > 0 %}
-                                                ⬇️ Low ({{ asset.risk_score }})
-                                            {% else %}
-                                                ⚪ None (0)
+                                        <span class="risk-badge risk-badge-{{
+                                            'extreme' if asset.risk_score >= 80
+                                            else 'severe' if asset.risk_score >= 50
+                                            else 'critical' if asset.risk_score >= 20
+                                            else 'high' if asset.risk_score >= 10
+                                            else 'medium' if asset.risk_score >= 5
+                                            else 'low' if asset.risk_score > 0
+                                            else 'none'
+                                        }}">
+                                            {{ asset.risk_score }}
+                                        </span>
+                                        <div class="risk-progress">
+                                            <div class="progress">
+                                                <div class="progress-bar bg-{{
+                                                    'danger' if asset.risk_score >= 80
+                                                    else 'warning' if asset.risk_score >= 50
+                                                    else 'info' if asset.risk_score >= 20
+                                                    else 'secondary'
+                                                }}"
+                                                style="width: {{ asset.risk_score }}%"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if asset.risk_score >= 80 %}
+                                            🔥 Extreme Risk
+                                        {% elif asset.risk_score >= 50 %}
+                                            💀 Severe Risk
+                                        {% elif asset.risk_score >= 20 %}
+                                            ⚠️ Critical Risk
+                                        {% elif asset.risk_score >= 10 %}
+                                            ⬆️ High Risk
+                                        {% elif asset.risk_score >= 5 %}
+                                            ➡️ Medium Risk
+                                        {% elif asset.risk_score > 0 %}
+                                            ⬇️ Low Risk
+                                        {% else %}
+                                            ⚪ No Risk
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% set asset_vulns = asset.vulnerabilities %}
+                                        {% set critical = asset_vulns|selectattr('severity', 'eq', 'critical')|list|length %}
+                                        {% set high = asset_vulns|selectattr('severity', 'eq', 'high')|list|length %}
+                                        {% set medium = asset_vulns|selectattr('severity', 'eq', 'medium')|list|length %}
+                                        <div>
+                                            {% if critical > 0 %}
+                                                <span class="vulnerability-badge vuln-critical" title="Critical vulnerabilities">
+                                                    <i class="bi bi-bug"></i> {{ critical }} C
+                                                </span>
                                             {% endif %}
+                                            {% if high > 0 %}
+                                                <span class="vulnerability-badge vuln-high" title="High vulnerabilities">
+                                                    <i class="bi bi-bug"></i> {{ high }} H
+                                                </span>
+                                            {% endif %}
+                                            {% if medium > 0 %}
+                                                <span class="vulnerability-badge vuln-medium" title="Medium vulnerabilities">
+                                                    <i class="bi bi-bug"></i> {{ medium }} M
+                                                </span>
+                                            {% endif %}
+                                            {% if critical == 0 and high == 0 and medium == 0 %}
+                                                <span class="text-muted">No critical/high</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% set inventory_count = asset.inventory|length %}
+                                        <span class="hover-tooltip" title="Total discovered assets: {{ inventory_count }}">
+                                            <i class="bi bi-files"></i> {{ inventory_count }}
                                         </span>
                                     </td>
                                     <td>
                                         {% if asset.monitoring_enabled %}
-                                            <span class="badge bg-success">Active</span>
+                                            <span class="badge bg-success"><i class="bi bi-play"></i> Active</span>
                                         {% else %}
-                                            <span class="badge bg-secondary">Paused</span>
+                                            <span class="badge bg-secondary"><i class="bi bi-pause"></i> Paused</span>
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{{ url_for('view_asset', asset_id=asset.id) }}" class="btn btn-sm btn-outline-shodan" title="View Details">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                        <a href="{{ url_for('view_vulnerabilities', asset_id=asset.id) }}" class="btn btn-sm btn-outline-shodan" title="View Vulnerabilities">
-                                            <i class="bi bi-bug"></i>
-                                        </a>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ url_for('view_asset', asset_id=asset.id) }}" class="btn btn-outline-shodan" title="View Details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('view_vulnerabilities', asset_id=asset.id) }}" class="btn btn-outline-shodan" title="View Vulnerabilities">
+                                                <i class="bi bi-bug"></i>
+                                            </a>
+                                            <a href="{{ url_for('view_report', asset_id=asset.id) }}" class="btn btn-outline-shodan" title="View Report">
+                                                <i class="bi bi-file-text"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -565,13 +747,14 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Asset Breakdown -->
+        <!-- Asset Breakdown & Tools -->
+        <div class="row">
             <div class="col-md-6">
                 <div class="chart-container">
-                    <h5 class="mb-3"><i class="bi bi-grid-3x3-gap-fill"></i> Asset Breakdown</h5>
+                    <h5 class="mb-3"><i class="bi bi-grid-3x3-gap-fill"></i> Asset Breakdown by Type</h5>
                     <div class="row g-3">
-                        <!-- Original types -->
                         <div class="col-4 text-center">
                             <span class="asset-pill asset-domain"><i class="bi bi-globe"></i> Domain</span>
                             <h4 class="mt-2">{{ domains_count }}</h4>
@@ -596,7 +779,6 @@
                             <span class="asset-pill asset-shadow"><i class="bi bi-exclamation-triangle"></i> Shadow</span>
                             <h4 class="mt-2">{{ shadow_count }}</h4>
                         </div>
-                        <!-- New types -->
                         <div class="col-4 text-center">
                             <span class="asset-pill asset-service"><i class="bi bi-hdd"></i> Service</span>
                             <h4 class="mt-2">{{ services_count }}</h4>
@@ -618,41 +800,54 @@
                             <h4 class="mt-2">{{ api_count }}</h4>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <hr class="bg-secondary my-4">
-
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5 class="mb-3"><i class="bi bi-tools"></i> Discovery Tools & Risk Factors</h5>
                     <div class="row">
-                        <div class="col-12">
-                            <h6 class="text-info"><i class="bi bi-tools"></i> Discovery Tools</h6>
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <ul class="list-unstyled small">
-                                        <li><i class="bi bi-check-circle-fill text-success"></i> Subfinder</li>
-                                        <li><i class="bi bi-check-circle-fill text-success"></i> Amass</li>
-                                        <li><i class="bi bi-check-circle-fill text-success"></i> Assetfinder</li>
-                                        <li><i class="bi bi-check-circle-fill text-success"></i> DNSX</li>
-                                        <li><i class="bi bi-check-circle-fill text-success"></i> HTTPX</li>
-                                        <li><i class="bi bi-check-circle-fill text-success"></i> Naabu</li>
-                                    </ul>
-                                </div>
-                                <div class="col-6">
-                                    <ul class="list-unstyled small">
-                                        <li><i class="bi bi-check-circle-fill text-success"></i> Katana</li>
-                                        <li><i class="bi bi-check-circle-fill text-success"></i> GAU</li>
-                                        <li><i class="bi bi-check-circle-fill text-success"></i> Nuclei</li>
-                                        <li><i class="bi bi-check-circle-fill text-success"></i> Gowitness</li>
-                                        <li><i class="bi bi-check-circle-fill text-success"></i> Subzy</li>
-                                        <li><i class="bi bi-check-circle-fill text-success"></i> WhatWeb / Wappalyzer</li>
-                                    </ul>
-                                </div>
-                            </div>
+                        <div class="col-6">
+                            <h6 class="text-info"><i class="bi bi-search"></i> Discovery Tools</h6>
+                            <ul class="list-unstyled small">
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Subfinder</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Amass</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Assetfinder</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> DNSX</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> HTTPX</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Naabu</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Katana</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> GAU</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Nuclei</li>
+                            </ul>
                         </div>
+                        <div class="col-6">
+                            <h6 class="text-warning"><i class="bi bi-exclamation-triangle"></i> Risk Factors</h6>
+                            <ul class="list-unstyled small">
+                                <li><i class="bi bi-bug"></i> Vulnerability Severity (10/7/4/1 pts)</li>
+                                <li><i class="bi bi-hdd"></i> Services (0.2 pts each, cap 10)</li>
+                                <li><i class="bi bi-cpu"></i> Technologies (0.1 pts each, cap 5)</li>
+                                <li><i class="bi bi-plug"></i> Open Ports (0.1 pts each, cap 5)</li>
+                                <li class="mt-2 text-muted">Maximum Score: 100</li>
+                                <li class="text-info">Scores update after each scan</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <hr class="bg-secondary my-3">
+                    <div class="text-center">
+                        <span class="risk-badge risk-badge-extreme">Extreme (80+)</span>
+                        <span class="risk-badge risk-badge-severe">Severe (50-79)</span>
+                        <span class="risk-badge risk-badge-critical">Critical (20-49)</span>
+                        <span class="risk-badge risk-badge-high">High (10-19)</span>
+                        <span class="risk-badge risk-badge-medium">Medium (5-9)</span>
+                        <span class="risk-badge risk-badge-low">Low (1-4)</span>
+                        <span class="risk-badge risk-badge-none">None (0)</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Recent Activity -->
+        <!-- Recent Discoveries with Risk Scores -->
         <div class="row mt-4">
             <div class="col-12">
                 <div class="chart-container">
@@ -660,10 +855,11 @@
                     <div class="table-responsive">
                         <table class="table" id="recentTable">
                             <thead>
-
+                                <tr>
                                     <th>Type</th>
                                     <th>Value</th>
                                     <th>Asset</th>
+                                    <th>Risk Score</th>
                                     <th>Status</th>
                                     <th>Discovered By</th>
                                     <th>Date</th>
@@ -671,7 +867,7 @@
                             </thead>
                             <tbody>
                                 {% for item in inventory %}
-                                <tr>
+                                <tr data-asset-risk="{{ item.asset.risk_score if item.asset else 0 }}">
                                     <td>
                                         <span class="asset-pill asset-{{ item.asset_type }}">
                                             {{ item.asset_type }}
@@ -685,6 +881,23 @@
                                             </a>
                                         {% else %}
                                             <span class="text-secondary">Orphan</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if item.asset %}
+                                            <span class="risk-badge risk-badge-{{
+                                                'extreme' if item.asset.risk_score >= 80
+                                                else 'severe' if item.asset.risk_score >= 50
+                                                else 'critical' if item.asset.risk_score >= 20
+                                                else 'high' if item.asset.risk_score >= 10
+                                                else 'medium' if item.asset.risk_score >= 5
+                                                else 'low' if item.asset.risk_score > 0
+                                                else 'none'
+                                            }}" style="font-size: 0.7rem; padding: 0.15rem 0.4rem;">
+                                                {{ item.asset.risk_score }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">N/A</span>
                                         {% endif %}
                                     </td>
                                     <td>
@@ -722,7 +935,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Render charts
-
+        {% if charts.type_distribution %}
+        var typeChart = {{ charts.type_distribution | safe }};
+        Plotly.newPlot('typeChart', typeChart.data, typeChart.layout);
+        {% endif %}
 
         {% if charts.status_distribution %}
         var statusChart = {{ charts.status_distribution | safe }};
@@ -734,6 +950,10 @@
         Plotly.newPlot('riskChart', riskChart.data, riskChart.layout);
         {% endif %}
 
+        {% if charts.timeline %}
+        var timelineChart = {{ charts.timeline | safe }};
+        Plotly.newPlot('timelineChart', timelineChart.data, timelineChart.layout);
+        {% endif %}
 
         function refreshStats() {
             var icon = document.getElementById('refresh-icon');
@@ -763,23 +983,89 @@
             if (typeof timelineChart !== 'undefined') Plotly.relayout('timelineChart', { width: document.getElementById('timelineChart').offsetWidth });
         });
 
-        // Simple filter for inventory table
+        // Combined filter for inventory table and top risk assets
         document.getElementById('filterBtn')?.addEventListener('click', function() {
             let filter = document.getElementById('assetFilter').value.toLowerCase();
+            let riskFilter = document.getElementById('riskFilter').value;
+
+            // Filter recent discoveries table
             let table = document.getElementById('recentTable');
-            if (!table) return;
-            let rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-            for (let row of rows) {
-                let type = row.cells[0]?.innerText.toLowerCase() || '';
-                let value = row.cells[1]?.innerText.toLowerCase() || '';
-                let asset = row.cells[2]?.innerText.toLowerCase() || '';
-                if (type.includes(filter) || value.includes(filter) || asset.includes(filter) || filter === '') {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
+            if (table) {
+                let rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+                for (let row of rows) {
+                    let type = row.cells[0]?.innerText.toLowerCase() || '';
+                    let value = row.cells[1]?.innerText.toLowerCase() || '';
+                    let asset = row.cells[2]?.innerText.toLowerCase() || '';
+                    let riskScore = parseInt(row.dataset.assetRisk) || 0;
+
+                    let riskMatch = true;
+                    if (riskFilter !== 'all') {
+                        if (riskFilter === 'extreme') riskMatch = riskScore >= 80;
+                        else if (riskFilter === 'severe') riskMatch = riskScore >= 50 && riskScore <= 79;
+                        else if (riskFilter === 'critical') riskMatch = riskScore >= 20 && riskScore <= 49;
+                        else if (riskFilter === 'high') riskMatch = riskScore >= 10 && riskScore <= 19;
+                        else if (riskFilter === 'medium') riskMatch = riskScore >= 5 && riskScore <= 9;
+                        else if (riskFilter === 'low') riskMatch = riskScore >= 1 && riskScore <= 4;
+                        else if (riskFilter === 'none') riskMatch = riskScore === 0;
+                    }
+
+                    if ((type.includes(filter) || value.includes(filter) || asset.includes(filter) || filter === '') && riskMatch) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            }
+
+            // Filter top risk assets table
+            let riskTable = document.getElementById('topRiskTable');
+            if (riskTable) {
+                let rows = riskTable.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+                for (let row of rows) {
+                    let riskScore = parseInt(row.dataset.riskScore) || 0;
+                    let riskMatch = true;
+                    if (riskFilter !== 'all') {
+                        if (riskFilter === 'extreme') riskMatch = riskScore >= 80;
+                        else if (riskFilter === 'severe') riskMatch = riskScore >= 50 && riskScore <= 79;
+                        else if (riskFilter === 'critical') riskMatch = riskScore >= 20 && riskScore <= 49;
+                        else if (riskFilter === 'high') riskMatch = riskScore >= 10 && riskScore <= 19;
+                        else if (riskFilter === 'medium') riskMatch = riskScore >= 5 && riskScore <= 9;
+                        else if (riskFilter === 'low') riskMatch = riskScore >= 1 && riskScore <= 4;
+                        else if (riskFilter === 'none') riskMatch = riskScore === 0;
+                    }
+                    row.style.display = riskMatch ? '' : 'none';
                 }
             }
         });
+
+        // Highlight high risk rows
+        function highlightHighRiskRows() {
+            document.querySelectorAll('#topRiskTable tbody tr').forEach(row => {
+                let riskScore = parseInt(row.dataset.riskScore);
+                if (riskScore >= 80) {
+                    row.style.borderLeft = '4px solid #8B0000';
+                } else if (riskScore >= 50) {
+                    row.style.borderLeft = '4px solid #DC143C';
+                } else if (riskScore >= 20) {
+                    row.style.borderLeft = '4px solid #e74c3c';
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            highlightHighRiskRows();
+        });
+
+        // Auto-refresh every 30 seconds if any scans running
+        setInterval(() => {
+            // Check if any scans might be running (optional)
+            fetch('/asi/stats')
+                .then(response => response.json())
+                .then(data => {
+                    // Optionally update risk scores dynamically
+                })
+                .catch(err => console.log('Auto-refresh skipped'));
+        }, 30000);
     </script>
 </body>
 </html>
