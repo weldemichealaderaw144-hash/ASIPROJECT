@@ -6,9 +6,9 @@
     <title>Report · {{ asset.domain }}</title>
     <!-- Bootstrap 5 dark theme -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons (instead of Font Awesome) -->
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- Google Fonts: Inter + Roboto Mono -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -24,6 +24,12 @@
             --warning: #f6c445;
             --danger: #f05f5f;
             --info: #68a2cf;
+            --extreme: #8B0000;
+            --severe: #DC143C;
+            --critical: #e74c3c;
+            --high: #e67e22;
+            --medium: #f1c40f;
+            --low: #3498db;
         }
 
         body {
@@ -34,7 +40,30 @@
             margin: 0;
         }
 
-        /* Navbar (identical to dashboard) */
+        /* Print styles */
+        @media print {
+            body {
+                background-color: white;
+                color: black;
+                padding-top: 0;
+            }
+            .navbar, .action-buttons, .btn, .no-print {
+                display: none !important;
+            }
+            .card-shodan, .stat-item {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            .risk-badge, .severity-badge {
+                border: 1px solid #ccc;
+            }
+            a {
+                text-decoration: none;
+                color: black;
+            }
+        }
+
+        /* Navbar */
         .navbar.bg-dark {
             background-color: var(--bg-header) !important;
             border-bottom: 1px solid var(--border-color);
@@ -71,6 +100,7 @@
         /* Page header */
         .report-header {
             margin-bottom: 2rem;
+            text-align: center;
         }
         .report-header h2 {
             font-weight: 400;
@@ -121,6 +151,11 @@
             border-radius: 8px;
             padding: 0.8rem;
             text-align: center;
+            transition: transform 0.2s;
+        }
+        .stat-item:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
         }
         .stat-value {
             font-size: 1.8rem;
@@ -136,7 +171,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* Risk score badge (aligned with dashboard) */
+        /* Risk badge */
         .risk-badge {
             font-size: 1.2rem;
             padding: 0.4rem 1rem;
@@ -145,8 +180,15 @@
             font-weight: 500;
             display: inline-block;
         }
+        .risk-badge-extreme { background-color: var(--extreme); color: #fff; }
+        .risk-badge-severe { background-color: var(--severe); color: #fff; }
+        .risk-badge-critical { background-color: var(--critical); color: #fff; }
+        .risk-badge-high { background-color: var(--high); color: #000; }
+        .risk-badge-medium { background-color: var(--medium); color: #000; }
+        .risk-badge-low { background-color: var(--low); color: #fff; }
+        .risk-badge-none { background-color: #95a5a6; color: #000; }
 
-        /* Tables (card-like rows) */
+        /* Tables */
         .table {
             background-color: transparent;
             border-collapse: separate;
@@ -190,6 +232,7 @@
         /* Monospaced data */
         .mono-data {
             font-family: 'Roboto Mono', monospace;
+            word-break: break-all;
         }
 
         /* Severity badges */
@@ -203,45 +246,47 @@
             letter-spacing: 0.3px;
         }
         .severity-critical {
-            background-color: #1f2a33;
+            background-color: rgba(240, 95, 95, 0.2);
             color: var(--danger);
             border: 1px solid var(--danger);
         }
         .severity-high {
-            background-color: #1f2a33;
+            background-color: rgba(255, 159, 75, 0.2);
             color: #ff9f4b;
             border: 1px solid #ff9f4b;
         }
         .severity-medium {
-            background-color: #1f2a33;
+            background-color: rgba(246, 196, 69, 0.2);
             color: var(--warning);
             border: 1px solid var(--warning);
         }
         .severity-low {
-            background-color: #1f2a33;
+            background-color: rgba(63, 182, 139, 0.2);
             color: var(--success);
             border: 1px solid var(--success);
         }
         .severity-info {
-            background-color: #1f2a33;
+            background-color: rgba(104, 162, 207, 0.2);
             color: var(--info);
             border: 1px solid var(--info);
         }
 
         /* Status badges */
         .status-approved {
-            background-color: #1f2a33;
+            background-color: rgba(63, 182, 139, 0.2);
             color: var(--success);
             border: 1px solid var(--success);
             padding: 0.2rem 0.6rem;
             border-radius: 20px;
+            display: inline-block;
         }
         .status-shadow {
-            background-color: #1f2a33;
+            background-color: rgba(246, 196, 69, 0.2);
             color: var(--warning);
             border: 1px solid var(--warning);
             padding: 0.2rem 0.6rem;
             border-radius: 20px;
+            display: inline-block;
         }
 
         /* Buttons */
@@ -274,21 +319,57 @@
         }
 
         /* Collapsible chevron */
+        .card-header[data-bs-toggle="collapse"] {
+            cursor: pointer;
+        }
         .card-header[data-bs-toggle="collapse"] .bi-chevron-down {
             transition: transform 0.2s;
         }
         .card-header[data-bs-toggle="collapse"][aria-expanded="true"] .bi-chevron-down {
             transform: rotate(180deg);
         }
+
+        /* Progress bar */
+        .risk-progress {
+            width: 100%;
+            margin-top: 10px;
+        }
+        .risk-progress .progress {
+            height: 8px;
+            background-color: var(--bg-dark);
+            border-radius: 4px;
+        }
+
+        /* Vulnerability list */
+        .vuln-item {
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+        }
+        .vuln-item:last-child {
+            border-bottom: none;
+        }
+        
+        /* Score circle */
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body data-bs-theme="dark">
 
-    <!-- Shodan‑style navbar (same as dashboard) -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: #0f1419;">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top no-print">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ url_for('dashboard') }}">
-                <i class="bi bi-shield-shaded"></i> ASI <span style="color:#f68b1f;">Admin</span>
+                <i class="bi bi-shield-shaded"></i> ASI <span style="color:#f68b1f;">Intel</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -317,61 +398,123 @@
     <!-- Main content -->
     <div class="container">
         <!-- Report header -->
-        <div class="report-header text-center">
-            <h2><i class="bi bi-file-earmark-text"></i> Asset Report: {{ asset.domain }}</h2>
-            <p class="text-muted">Created: {{ asset.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+        <div class="report-header">
+            <h2><i class="bi bi-file-earmark-text"></i> Asset Security Report</h2>
+            <h3 class="mt-2">{{ asset.domain }}</h3>
+            <p class="text-muted">
+                <i class="bi bi-calendar3"></i> Created: {{ asset.created_at.strftime('%Y-%m-%d %H:%M UTC') }}
+                {% if asset.last_monitored_at %}
+                | <i class="bi bi-clock-history"></i> Last Monitored: {{ asset.last_monitored_at.strftime('%Y-%m-%d %H:%M UTC') }}
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Risk Score Overview Card -->
+        <div class="card-shodan">
+            <div class="card-header"><i class="bi bi-shield-check"></i> Overall Risk Assessment</div>
+            <div class="card-body text-center">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <div class="score-circle" style="background: {% if risk_score >= 80 %}linear-gradient(135deg, #8B0000, #DC143C){% elif risk_score >= 50 %}linear-gradient(135deg, #DC143C, #e74c3c){% elif risk_score >= 20 %}linear-gradient(135deg, #e74c3c, #e67e22){% else %}linear-gradient(135deg, #3498db, #2ecc71){% endif %};">
+                            {{ risk_score }}
+                        </div>
+                        <div class="risk-badge risk-badge-{{ 
+                            'extreme' if risk_score >= 80 
+                            else 'severe' if risk_score >= 50 
+                            else 'critical' if risk_score >= 20 
+                            else 'high' if risk_score >= 10 
+                            else 'medium' if risk_score >= 5 
+                            else 'low' if risk_score > 0 
+                            else 'none' 
+                        }} mt-2">
+                            {{ risk_level }} Risk
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="risk-progress">
+                            <div class="progress">
+                                <div class="progress-bar bg-{{ 
+                                    'danger' if risk_score >= 80 
+                                    else 'warning' if risk_score >= 50 
+                                    else 'info' if risk_score >= 20 
+                                    else 'success' 
+                                }}" 
+                                role="progressbar" 
+                                style="width: {{ risk_score }}%"
+                                aria-valuenow="{{ risk_score }}" 
+                                aria-valuemin="0" 
+                                aria-valuemax="100">
+                                    {{ risk_score }}%
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-secondary mt-3">
+                            Risk score is calculated based on vulnerabilities, exposed services, technologies, 
+                            open ports, and shadow assets. Higher scores indicate greater security risk.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Inventory Summary Card -->
         <div class="card-shodan">
-            <div class="card-header"><i class="bi bi-boxes"></i> Inventory Summary</div>
+            <div class="card-header"><i class="bi bi-boxes"></i> Attack Surface Inventory</div>
             <div class="card-body">
                 <div class="stats-grid">
-                    <div class="stat-item"><span class="stat-value">{{ domains_count }}</span><div class="stat-label">Domains</div></div>
-                    <div class="stat-item"><span class="stat-value">{{ subdomains_count }}</span><div class="stat-label">Subdomains</div></div>
-                    <div class="stat-item"><span class="stat-value">{{ urls_count }}</span><div class="stat-label">URLs</div></div>
-                    <div class="stat-item"><span class="stat-value">{{ ips_count }}</span><div class="stat-label">IPs</div></div>
-                    <div class="stat-item"><span class="stat-value">{{ ports_count }}</span><div class="stat-label">Ports</div></div>
-                    <div class="stat-item"><span class="stat-value">{{ services_count }}</span><div class="stat-label">Services</div></div>
-                    <div class="stat-item"><span class="stat-value">{{ technologies_count }}</span><div class="stat-label">Technologies</div></div>
-                    <div class="stat-item"><span class="stat-value">{{ emails_count }}</span><div class="stat-label">Emails</div></div>
-                    <div class="stat-item"><span class="stat-value">{{ cloud_count }}</span><div class="stat-label">Cloud Assets</div></div>
-                    <div class="stat-item"><span class="stat-value">{{ api_count }}</span><div class="stat-label">API Endpoints</div></div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ domains_count }}</div>
+                        <div class="stat-label"><i class="bi bi-globe"></i> Domains</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ subdomains_count }}</div>
+                        <div class="stat-label"><i class="bi bi-diagram-2"></i> Subdomains</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ urls_count }}</div>
+                        <div class="stat-label"><i class="bi bi-link"></i> URLs</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ ips_count }}</div>
+                        <div class="stat-label"><i class="bi bi-hdd-network"></i> IPs</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ ports_count }}</div>
+                        <div class="stat-label"><i class="bi bi-plug"></i> Ports</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ services_count }}</div>
+                        <div class="stat-label"><i class="bi bi-hdd"></i> Services</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ technologies_count }}</div>
+                        <div class="stat-label"><i class="bi bi-cpu"></i> Technologies</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ emails_count }}</div>
+                        <div class="stat-label"><i class="bi bi-envelope"></i> Emails</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ cloud_count }}</div>
+                        <div class="stat-label"><i class="bi bi-cloud"></i> Cloud Assets</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ api_count }}</div>
+                        <div class="stat-label"><i class="bi bi-code-slash"></i> API Endpoints</div>
+                    </div>
                 </div>
                 <hr style="border-color: var(--border-color);">
-                <div>
+                <div class="d-flex gap-3">
                     <span class="status-approved"><i class="bi bi-check-circle"></i> Approved: {{ approved_count }}</span>
-                    <span class="status-shadow ms-2"><i class="bi bi-exclamation-triangle"></i> Shadow: {{ shadow_count }}</span>
+                    <span class="status-shadow"><i class="bi bi-exclamation-triangle"></i> Shadow: {{ shadow_count }}</span>
                 </div>
             </div>
         </div>
 
         <!-- Risk Score Breakdown Card -->
         <div class="card-shodan">
-            <div class="card-header"><i class="bi bi-graph-up"></i> Risk Score & Breakdown</div>
+            <div class="card-header"><i class="bi bi-pie-chart"></i> Risk Score Breakdown</div>
             <div class="card-body">
-                <h5 class="mb-3">
-                    Overall Weighted Score:
-                    <span class="risk-badge">
-                        {% if risk_score >= 80 %}
-                            🔥 Extreme ({{ risk_score }})
-                        {% elif risk_score >= 50 %}
-                            💀 Severe ({{ risk_score }})
-                        {% elif risk_score >= 20 %}
-                            ⚠️ Critical ({{ risk_score }})
-                        {% elif risk_score >= 10 %}
-                            ⬆️ High ({{ risk_score }})
-                        {% elif risk_score >= 5 %}
-                            ➡️ Medium ({{ risk_score }})
-                        {% elif risk_score > 0 %}
-                            ⬇️ Low ({{ risk_score }})
-                        {% else %}
-                            ⚪ None (0)
-                        {% endif %}
-                    </span>
-                    <span class="text-secondary">/ 100 ({{ risk_level }})</span>
-                </h5>
-                <p class="text-secondary">በተገኙ የደህንነት እክሎች (vulnerabilities), የተሸሸጉ ንብረቶች (shadow assets), የተጋለጡ አገልግሎቶች (exposed services), ቴክኖሎጂዎች (technologies), እና ክፍት ፖርቶች (open ports) በመመርኮዝ ይቆጠራል።</p>
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
@@ -380,38 +523,83 @@
                                 <th>Weight</th>
                                 <th>Count</th>
                                 <th>Contribution</th>
+                                <th>Impact</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Vulnerabilities</td>
+                                <td><i class="bi bi-bug"></i> Vulnerabilities</td>
                                 <td>Critical:10, High:7, Medium:4, Low:1</td>
-                                <td>{{ vuln_counts.critical }}/{{ vuln_counts.high }}/{{ vuln_counts.medium }}/{{ vuln_counts.low }}</td>
-                                <td>{{ vuln_contribution }}</td>
+                                <td>
+                                    <span class="text-danger">{{ vuln_counts.critical }}</span> / 
+                                    <span class="text-warning">{{ vuln_counts.high }}</span> / 
+                                    <span class="text-info">{{ vuln_counts.medium }}</span> / 
+                                    <span class="text-success">{{ vuln_counts.low }}</span>
+                                </td>
+                                <td class="fw-bold">{{ "%.1f"|format(vuln_contribution) }}</td>
+                                <td>
+                                    <div class="progress" style="width: 100px;">
+                                        <div class="progress-bar bg-danger" style="width: {{ (vuln_contribution / 100 * 100) if vuln_contribution <= 100 else 100 }}%"></div>
+                                    </div>
+                                </td>
                             </tr>
                             <tr>
-                                <td>Shadow Assets</td>
+                                <td><i class="bi bi-exclamation-triangle"></i> Shadow Assets</td>
                                 <td>0.5 each (max 10)</td>
                                 <td>{{ shadow_count }}</td>
-                                <td>{{ shadow_contribution }}</td>
+                                <td class="fw-bold">{{ "%.1f"|format(shadow_contribution) }}</td>
+                                <td>
+                                    <div class="progress" style="width: 100px;">
+                                        <div class="progress-bar bg-warning" style="width: {{ (shadow_contribution / 10 * 100) if shadow_contribution <= 10 else 100 }}%"></div>
+                                    </div>
+                                </td>
                             </tr>
                             <tr>
-                                <td>Services</td>
+                                <td><i class="bi bi-hdd"></i> Services</td>
                                 <td>0.2 each (max 10)</td>
                                 <td>{{ services_count }}</td>
-                                <td>{{ service_contribution }}</td>
+                                <td class="fw-bold">{{ "%.1f"|format(service_contribution) }}</td>
+                                <td>
+                                    <div class="progress" style="width: 100px;">
+                                        <div class="progress-bar bg-info" style="width: {{ (service_contribution / 10 * 100) if service_contribution <= 10 else 100 }}%"></div>
+                                    </div>
+                                </td>
                             </tr>
                             <tr>
-                                <td>Technologies</td>
+                                <td><i class="bi bi-cpu"></i> Technologies</td>
                                 <td>0.1 each (max 5)</td>
                                 <td>{{ technologies_count }}</td>
-                                <td>{{ tech_contribution }}</td>
+                                <td class="fw-bold">{{ "%.1f"|format(tech_contribution) }}</td>
+                                <td>
+                                    <div class="progress" style="width: 100px;">
+                                        <div class="progress-bar bg-success" style="width: {{ (tech_contribution / 5 * 100) if tech_contribution <= 5 else 100 }}%"></div>
+                                    </div>
+                                </td>
                             </tr>
                             <tr>
-                                <td>Open Ports</td>
+                                <td><i class="bi bi-plug"></i> Open Ports</td>
                                 <td>0.1 each (max 5)</td>
                                 <td>{{ ports_count }}</td>
-                                <td>{{ port_contribution }}</td>
+                                <td class="fw-bold">{{ "%.1f"|format(port_contribution) }}</td>
+                                <td>
+                                    <div class="progress" style="width: 100px;">
+                                        <div class="progress-bar bg-secondary" style="width: {{ (port_contribution / 5 * 100) if port_contribution <= 5 else 100 }}%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-active">
+                                <td colspan="3"><strong>TOTAL RISK SCORE</strong></td>
+                                <td class="fw-bold h4">{{ risk_score }}</td>
+                                <td>
+                                    <div class="progress" style="width: 100px;">
+                                        <div class="progress-bar bg-{{ 
+                                            'danger' if risk_score >= 80 
+                                            else 'warning' if risk_score >= 50 
+                                            else 'info' if risk_score >= 20 
+                                            else 'success' 
+                                        }}" style="width: {{ risk_score }}%"></div>
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -421,58 +609,107 @@
 
         <!-- Vulnerabilities Card -->
         <div class="card-shodan">
-            <div class="card-header"><i class="bi bi-bug"></i> Vulnerabilities</div>
+            <div class="card-header"><i class="bi bi-bug"></i> Vulnerabilities ({{ vulnerabilities|length }})</div>
             <div class="card-body">
                 {% if vulnerabilities %}
-                <ul class="list-group list-group-flush bg-transparent">
-                    {% for vuln in vulnerabilities %}
-                    <li class="list-group-item bg-transparent text-light" style="border-bottom: 1px solid var(--border-color);">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <strong>{{ vuln.name }}</strong><br>
-                                <small class="text-secondary">URL: <a href="{{ vuln.url }}" target="_blank" class="text-info">{{ vuln.url }}</a></small>
+                    <div class="vulnerability-list">
+                        {% for vuln in vulnerabilities %}
+                        <div class="vuln-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <span class="severity-badge severity-{{ vuln.severity }}">
+                                            {{ vuln.severity|upper }}
+                                        </span>
+                                        <strong>{{ vuln.name }}</strong>
+                                    </div>
+                                    <small class="text-secondary">
+                                        <i class="bi bi-link-45deg"></i> URL: 
+                                        <a href="{{ vuln.url }}" target="_blank" class="text-info text-decoration-none">{{ vuln.url }}</a>
+                                    </small>
+                                    <br>
+                                    <small class="text-secondary">
+                                        <i class="bi bi-tag"></i> Template: {{ vuln.template_id }}
+                                    </small>
+                                    {% if vuln.notes %}
+                                    <br>
+                                    <small class="text-warning">
+                                        <i class="bi bi-chat"></i> Notes: {{ vuln.notes }}
+                                    </small>
+                                    {% endif %}
+                                </div>
+                                <small class="text-secondary">
+                                    {{ vuln.matched_at.strftime('%Y-%m-%d') }}
+                                </small>
                             </div>
-                            <span class="severity-badge severity-{{ vuln.severity }}">
-                                {{ vuln.severity|upper }}
-                            </span>
                         </div>
-                    </li>
-                    {% endfor %}
-                </ul>
+                        {% endfor %}
+                    </div>
                 {% else %}
-                <p class="text-secondary">No vulnerabilities found.</p>
+                    <div class="text-center py-4">
+                        <i class="bi bi-shield-check" style="font-size: 3rem; color: var(--success);"></i>
+                        <p class="mt-2 text-success">No vulnerabilities found for this asset.</p>
+                    </div>
                 {% endif %}
             </div>
         </div>
 
-        <!-- Scans Card -->
+        <!-- Scan History Card -->
         <div class="card-shodan">
-            <div class="card-header"><i class="bi bi-clock-history"></i> Scans</div>
+            <div class="card-header"><i class="bi bi-clock-history"></i> Scan History</div>
             <div class="card-body">
                 {% if scans %}
-                <ul class="list-group list-group-flush bg-transparent">
-                    {% for scan in scans %}
-                    <li class="list-group-item bg-transparent text-light d-flex justify-content-between align-items-center" style="border-bottom: 1px solid var(--border-color);">
-                        <span>Scan ID: #{{ scan.id }}</span>
-                        <span>
-                            <span class="badge bg-{{ 'success' if scan.status == 'completed' else 'warning' if scan.status == 'running' else 'danger' if scan.status == 'failed' else 'secondary' }}">
-                                {{ scan.status }}
-                            </span>
-                        </span>
-                        <small class="text-secondary">Finished: {{ scan.finished_at.strftime('%Y-%m-%d %H:%M') if scan.finished_at else 'N/A' }}</small>
-                    </li>
-                    {% endfor %}
-                </ul>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Scan ID</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Started</th>
+                                <th>Finished</th>
+                                <th>Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for scan in scans %}
+                            <tr>
+                                <td class="mono-data">#{{ scan.id }}</td>
+                                <td>{{ scan.scan_type|capitalize }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 
+                                        'success' if scan.status == 'completed' 
+                                        else 'warning' if scan.status == 'running' 
+                                        else 'danger' if scan.status == 'failed' 
+                                        else 'secondary' 
+                                    }}">
+                                        {{ scan.status }}
+                                    </span>
+                                </td>
+                                <td class="mono-data">{{ scan.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td class="mono-data">{{ scan.finished_at.strftime('%Y-%m-%d %H:%M') if scan.finished_at else 'In Progress' }}</td>
+                                <td class="mono-data">
+                                    {% if scan.finished_at %}
+                                        {{ ((scan.finished_at - scan.created_at).total_seconds() / 60)|round(1) }} min
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
                 {% else %}
-                <p class="text-secondary">No scans recorded.</p>
+                <p class="text-secondary text-center py-3">No scans have been performed yet.</p>
                 {% endif %}
             </div>
         </div>
 
         <!-- Full Inventory (collapsible) -->
         <div class="card-shodan">
-            <div class="card-header" data-bs-toggle="collapse" data-bs-target="#fullInventory" aria-expanded="false" style="cursor:pointer;">
-                <i class="bi bi-list-ul"></i> Full Inventory
+            <div class="card-header" data-bs-toggle="collapse" data-bs-target="#fullInventory" aria-expanded="false">
+                <i class="bi bi-list-ul"></i> Complete Asset Inventory ({{ inventory|length }} items)
                 <i class="bi bi-chevron-down float-end"></i>
             </div>
             <div class="collapse" id="fullInventory">
@@ -483,6 +720,7 @@
                                 <tr>
                                     <th>Type</th>
                                     <th>Value</th>
+                                    <th>Version</th>
                                     <th>Status</th>
                                     <th>Discovered By</th>
                                     <th>Date</th>
@@ -491,8 +729,25 @@
                             <tbody>
                                 {% for item in inventory %}
                                 <tr>
-                                    <td>{{ item.asset_type }}</td>
+                                    <td>
+                                        <span class="asset-pill asset-{{ item.asset_type }}">
+                                            <i class="bi bi-{{ 
+                                                'globe' if item.asset_type == 'domain' 
+                                                else 'diagram-2' if item.asset_type == 'subdomain' 
+                                                else 'link' if item.asset_type == 'url' 
+                                                else 'hdd-network' if item.asset_type == 'ip' 
+                                                else 'plug' if item.asset_type == 'port' 
+                                                else 'hdd' if item.asset_type == 'service' 
+                                                else 'cpu' if item.asset_type == 'technology' 
+                                                else 'envelope' if item.asset_type == 'email' 
+                                                else 'cloud' if item.asset_type == 'cloud_asset' 
+                                                else 'code-slash' 
+                                            }}"></i>
+                                            {{ item.asset_type }}
+                                        </span>
+                                    </td>
                                     <td class="mono-data">{{ item.value }}</td>
+                                    <td class="mono-data">{{ item.version or '-' }}</td>
                                     <td>
                                         {% if item.status == 'approved' %}
                                             <span class="status-approved"><i class="bi bi-check-circle"></i> Approved</span>
@@ -500,7 +755,7 @@
                                             <span class="status-shadow"><i class="bi bi-exclamation-triangle"></i> Shadow</span>
                                         {% endif %}
                                     </td>
-                                    <td>{{ item.discovered_by }}</td>
+                                    <td><i class="bi bi-tools"></i> {{ item.discovered_by }}</td>
                                     <td class="mono-data">{{ item.created_at.strftime('%Y-%m-%d') }}</td>
                                 </tr>
                                 {% endfor %}
@@ -512,17 +767,45 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="mb-4 d-flex gap-3">
+        <div class="mb-5 d-flex gap-3 justify-content-center action-buttons no-print">
             <button class="btn btn-shodan-primary" onclick="window.print()">
-                <i class="bi bi-download"></i> Print / PDF
+                <i class="bi bi-printer"></i> Print / Save as PDF
             </button>
             <a href="{{ url_for('dashboard') }}" class="btn btn-outline-shodan-secondary">
                 <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+            <a href="{{ url_for('view_vulnerabilities', asset_id=asset.id) }}" class="btn btn-outline-shodan-secondary">
+                <i class="bi bi-bug"></i> View Vulnerabilities
             </a>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- No additional JS needed; Bootstrap handles collapse -->
+    <script>
+        // Add asset-pill styles dynamically
+        const style = document.createElement('style');
+        style.textContent = `
+            .asset-pill {
+                display: inline-block;
+                padding: 0.2rem 0.6rem;
+                border-radius: 20px;
+                font-size: 0.7rem;
+                font-weight: 500;
+                background-color: #1f2a33;
+                color: #fff;
+            }
+            .asset-domain { background-color: #3498db; }
+            .asset-subdomain { background-color: #2ecc71; color: #000; }
+            .asset-url { background-color: #e74c3c; }
+            .asset-ip { background-color: #f39c12; color: #000; }
+            .asset-port { background-color: #9b59b6; }
+            .asset-service { background-color: #1abc9c; color: #000; }
+            .asset-technology { background-color: #e67e22; }
+            .asset-email { background-color: #34495e; }
+            .asset-cloud_asset { background-color: #16a085; }
+            .asset-api_endpoint { background-color: #d35400; }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 </html>
