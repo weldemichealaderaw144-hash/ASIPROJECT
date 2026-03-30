@@ -1569,7 +1569,9 @@ def register_routes(app):
     def attack_surface_intelligence():
         assets = Asset.query.all()
         total_assets = len(assets)
-        all_inventory = AssetInventory.query.order_by(AssetInventory.created_at.desc()).limit(10).all()
+        all_inventory = AssetInventory.query.order_by(AssetInventory.created_at.desc()).limit(50).all()
+
+        # Asset counts
         domains_count = AssetInventory.query.filter_by(asset_type='domain').count()
         subdomains_count = AssetInventory.query.filter_by(asset_type='subdomain').count()
         urls_count = AssetInventory.query.filter_by(asset_type='url').count()
@@ -1583,53 +1585,128 @@ def register_routes(app):
         shadow_count = AssetInventory.query.filter_by(status='shadow').count()
         approved_count = AssetInventory.query.filter_by(status='approved').count()
 
+        # Risk statistics
+        avg_risk_score = db.session.query(func.avg(Asset.risk_score)).scalar() or 0
+        max_risk_score = db.session.query(func.max(Asset.risk_score)).scalar() or 0
+        max_risk_asset = Asset.query.order_by(Asset.risk_score.desc()).first()
+
+        # Vulnerability statistics
+        total_vulnerabilities = Vulnerability.query.count()
+        critical_vulns = Vulnerability.query.filter_by(severity='critical').count()
+        high_vulns = Vulnerability.query.filter_by(severity='high').count()
+
+        # Risk level counts
         extreme_risk = Asset.query.filter(Asset.risk_score >= 80).count()
         severe_risk = Asset.query.filter(Asset.risk_score.between(50, 79)).count()
         critical_risk = Asset.query.filter(Asset.risk_score.between(20, 49)).count()
         high_risk = Asset.query.filter(Asset.risk_score.between(10, 19)).count()
         medium_risk = Asset.query.filter(Asset.risk_score.between(5, 9)).count()
         low_risk = Asset.query.filter(Asset.risk_score.between(1, 4)).count()
+        low_risk_count = low_risk + medium_risk
         no_risk = Asset.query.filter(Asset.risk_score == 0).count()
 
         week_ago = datetime.now(timezone.utc) - timedelta(days=7)
         recent_discoveries = AssetInventory.query.filter(AssetInventory.created_at >= week_ago).count()
         top_risk_assets = Asset.query.order_by(Asset.risk_score.desc()).limit(5).all()
 
+        # Charts
         charts = {}
-        fig1 = go.Figure(data=[go.Bar(x=['Domains', 'Subdomains', 'URLs', 'IPs', 'Ports', 'Services', 'Tech', 'Email', 'Cloud', 'API'],
-                                       y=[domains_count, subdomains_count, urls_count, ips_count, ports_count, services_count, tech_count, email_count, cloud_count, api_count],
-                                       marker_color=['#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6', '#1abc9c', '#e67e22', '#34495e', '#16a085', '#d35400'])])
-        fig1.update_layout(title='Asset Type Distribution', xaxis_title='Asset Type', yaxis_title='Count', template='plotly_dark', height=400)
+
+        # Asset Type Distribution Chart
+        fig1 = go.Figure(data=[go.Bar(
+            x=['Domains', 'Subdomains', 'URLs', 'IPs', 'Ports', 'Services', 'Tech', 'Email', 'Cloud', 'API'],
+            y=[domains_count, subdomains_count, urls_count, ips_count, ports_count, services_count, tech_count,
+               email_count, cloud_count, api_count],
+            marker_color=['#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6', '#1abc9c', '#e67e22', '#34495e',
+                          '#16a085', '#d35400']
+        )])
+        fig1.update_layout(title='Asset Type Distribution', xaxis_title='Asset Type', yaxis_title='Count',
+                           template='plotly_dark', height=400)
         charts['type_distribution'] = json.dumps(fig1, cls=plotly.utils.PlotlyJSONEncoder)
 
-        fig2 = go.Figure(data=[go.Pie(labels=['Approved', 'Shadow'], values=[approved_count, shadow_count], marker_colors=['#2ecc71', '#e74c3c'], hole=0.4)])
+        # Status Distribution Chart
+        fig2 = go.Figure(data=[go.Pie(
+            labels=['Approved', 'Shadow'],
+            values=[approved_count, shadow_count],
+            marker_colors=['#2ecc71', '#e74c3c'],
+            hole=0.4
+        )])
         fig2.update_layout(title='Asset Status Distribution', template='plotly_dark', height=400)
         charts['status_distribution'] = json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
 
-        fig3 = go.Figure(data=[go.Bar(x=['Extreme (80+)', 'Severe (50-79)', 'Critical (20-49)', 'High (10-19)', 'Medium (5-9)', 'Low (1-4)', 'None (0)'],
-                                       y=[extreme_risk, severe_risk, critical_risk, high_risk, medium_risk, low_risk, no_risk],
-                                       marker_color=['#8B0000', '#DC143C', '#e74c3c', '#e67e22', '#f1c40f', '#3498db', '#95a5a6'])])
-        fig3.update_layout(title='Asset Risk Distribution', xaxis_title='Risk Level', yaxis_title='Number of Assets', template='plotly_dark', height=400)
+        # Risk Distribution Chart
+        fig3 = go.Figure(data=[go.Bar(
+            x=['Extreme (80+)', 'Severe (50-79)', 'Critical (20-49)', 'High (10-19)', 'Medium (5-9)', 'Low (1-4)',
+               'None (0)'],
+            y=[extreme_risk, severe_risk, critical_risk, high_risk, medium_risk, low_risk, no_risk],
+            marker_color=['#8B0000', '#DC143C', '#e74c3c', '#e67e22', '#f1c40f', '#3498db', '#95a5a6'],
+            text=[extreme_risk, severe_risk, critical_risk, high_risk, medium_risk, low_risk, no_risk],
+            textposition='auto'
+        )])
+        fig3.update_layout(title='Asset Risk Distribution', xaxis_title='Risk Level', yaxis_title='Number of Assets',
+                           template='plotly_dark', height=400)
         charts['risk_distribution'] = json.dumps(fig3, cls=plotly.utils.PlotlyJSONEncoder)
 
+        # Timeline Chart
         thirty_days_ago = datetime.now(timezone.utc) - timedelta(days=30)
-        daily_counts = db.session.query(func.date(AssetInventory.created_at).label('date'), func.count().label('count')).filter(AssetInventory.created_at >= thirty_days_ago).group_by(func.date(AssetInventory.created_at)).order_by('date').all()
+        daily_counts = db.session.query(
+            func.date(AssetInventory.created_at).label('date'),
+            func.count().label('count')
+        ).filter(AssetInventory.created_at >= thirty_days_ago).group_by(
+            func.date(AssetInventory.created_at)
+        ).order_by('date').all()
+
         dates = [str(d[0]) for d in daily_counts]
         counts = [d[1] for d in daily_counts]
-        fig4 = go.Figure(data=[go.Scatter(x=dates, y=counts, mode='lines+markers', line=dict(color='#3498db', width=3))])
-        fig4.update_layout(title='Asset Discovery Timeline (Last 30 Days)', xaxis_title='Date', yaxis_title='New Discoveries', template='plotly_dark', height=400)
+
+        fig4 = go.Figure(data=[go.Scatter(
+            x=dates,
+            y=counts,
+            mode='lines+markers',
+            line=dict(color='#3498db', width=3),
+            marker=dict(size=8)
+        )])
+        fig4.update_layout(title='Asset Discovery Timeline (Last 30 Days)', xaxis_title='Date',
+                           yaxis_title='New Discoveries', template='plotly_dark', height=400)
         charts['timeline'] = json.dumps(fig4, cls=plotly.utils.PlotlyJSONEncoder)
 
         log_activity("VIEW_ASI_DASHBOARD", "Attack Surface Intelligence")
-        return render_template("asi_dashboard.html", assets=assets, inventory=all_inventory, total_assets=total_assets,
-                               domains_count=domains_count, subdomains_count=subdomains_count, urls_count=urls_count,
-                               ips_count=ips_count, ports_count=ports_count, services_count=services_count,
-                               tech_count=tech_count, email_count=email_count, cloud_count=cloud_count, api_count=api_count,
-                               shadow_count=shadow_count, approved_count=approved_count, recent_discoveries=recent_discoveries,
-                               top_risk_assets=top_risk_assets, extreme_risk=extreme_risk, severe_risk=severe_risk,
-                               critical_risk=critical_risk, high_risk=high_risk, medium_risk=medium_risk,
-                               low_risk=low_risk, no_risk=no_risk, charts=charts)
 
+        return render_template(
+            "asi_dashboard.html",
+            assets=assets,
+            inventory=all_inventory,
+            total_assets=total_assets,
+            domains_count=domains_count,
+            subdomains_count=subdomains_count,
+            urls_count=urls_count,
+            ips_count=ips_count,
+            ports_count=ports_count,
+            services_count=services_count,
+            tech_count=tech_count,
+            email_count=email_count,
+            cloud_count=cloud_count,
+            api_count=api_count,
+            shadow_count=shadow_count,
+            approved_count=approved_count,
+            recent_discoveries=recent_discoveries,
+            top_risk_assets=top_risk_assets,
+            extreme_risk=extreme_risk,
+            severe_risk=severe_risk,
+            critical_risk=critical_risk,
+            high_risk=high_risk,
+            medium_risk=medium_risk,
+            low_risk=low_risk,
+            low_risk_count=low_risk_count,
+            no_risk=no_risk,
+            avg_risk_score=avg_risk_score,
+            max_risk_score=max_risk_score,
+            max_risk_asset=max_risk_asset,
+            total_vulnerabilities=total_vulnerabilities,
+            critical_vulns=critical_vulns,
+            high_vulns=high_vulns,
+            charts=charts
+        )
     @app.route("/asi/asset-map")
     @login_required
     def asset_map():
@@ -1734,7 +1811,6 @@ def register_routes(app):
                                services=services, technologies=technologies, emails=emails, cloud=cloud, apis=apis,
                                shadow=shadow, approved=approved)
 
-    # ------------------ FIXED test_nuclei route ------------------
     @app.route("/test-nuclei/<path:test_url>")
     @login_required
     @role_required("admin")
@@ -1749,6 +1825,8 @@ def register_routes(app):
             db.session.commit()
         findings = run_nuclei(asset, [test_url])
         return jsonify({"asset_id": asset.id, "domain": asset.domain, "findings_count": len(findings), "findings": findings[:10]})
+
+
 
 def create_default_users():
     if User.query.count() == 0:
