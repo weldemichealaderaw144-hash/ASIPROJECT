@@ -1524,9 +1524,18 @@ def register_routes(app):
         asset = db.session.get(Asset, asset_id)
         if not asset:
             abort(404)
+
+        # Get scans
         scans = Scan.query.filter_by(asset_id=asset.id).order_by(Scan.id.desc()).all()
-        vulnerabilities = Vulnerability.query.filter_by(asset_id=asset.id).order_by(Vulnerability.matched_at.desc()).all()
+
+        # Get vulnerabilities
+        vulnerabilities = Vulnerability.query.filter_by(asset_id=asset.id).order_by(
+            Vulnerability.matched_at.desc()).all()
+
+        # Get inventory
         inventory = AssetInventory.query.filter_by(parent_asset_id=asset.id).all()
+
+        # Counts by type
         domains_count = sum(1 for i in inventory if i.asset_type == 'domain')
         subdomains_count = sum(1 for i in inventory if i.asset_type == 'subdomain')
         urls_count = sum(1 for i in inventory if i.asset_type == 'url')
@@ -1537,8 +1546,12 @@ def register_routes(app):
         emails_count = sum(1 for i in inventory if i.asset_type == 'email')
         cloud_count = sum(1 for i in inventory if i.asset_type == 'cloud_asset')
         api_count = sum(1 for i in inventory if i.asset_type == 'api_endpoint')
+
+        # Status counts
         approved_count = sum(1 for i in inventory if i.status == 'approved')
         shadow_count = sum(1 for i in inventory if i.status == 'shadow')
+
+        # Vulnerability counts by severity
         vuln_counts = {
             'critical': sum(1 for v in vulnerabilities if v.severity == 'critical'),
             'high': sum(1 for v in vulnerabilities if v.severity == 'high'),
@@ -1546,24 +1559,46 @@ def register_routes(app):
             'low': sum(1 for v in vulnerabilities if v.severity == 'low'),
             'info': sum(1 for v in vulnerabilities if v.severity == 'info')
         }
+
+        # Calculate contributions
         severity_weights = {"critical": 10, "high": 7, "medium": 4, "low": 1, "info": 0}
         vuln_contribution = sum(severity_weights.get(sev, 0) * cnt for sev, cnt in vuln_counts.items())
         shadow_contribution = min(shadow_count * 0.5, 10)
         service_contribution = min(services_count * 0.2, 10)
         tech_contribution = min(technologies_count * 0.1, 5)
         port_contribution = min(ports_count * 0.1, 5)
+
+        # Risk score and level
         risk_score = asset.risk_score
         risk_level = get_risk_level(risk_score)
-        return render_template("report.html", asset=asset, scans=scans, vulnerabilities=vulnerabilities, inventory=inventory,
-                               domains_count=domains_count, subdomains_count=subdomains_count, urls_count=urls_count,
-                               ips_count=ips_count, ports_count=ports_count, services_count=services_count,
-                               technologies_count=technologies_count, emails_count=emails_count, cloud_count=cloud_count,
-                               api_count=api_count, approved_count=approved_count, shadow_count=shadow_count,
-                               vuln_counts=vuln_counts, vuln_contribution=vuln_contribution,
-                               shadow_contribution=shadow_contribution, service_contribution=service_contribution,
-                               tech_contribution=tech_contribution, port_contribution=port_contribution,
-                               risk_score=risk_score, risk_level=risk_level)
 
+        return render_template(
+            "report.html",
+            asset=asset,
+            scans=scans,
+            vulnerabilities=vulnerabilities,
+            inventory=inventory,
+            domains_count=domains_count,
+            subdomains_count=subdomains_count,
+            urls_count=urls_count,
+            ips_count=ips_count,
+            ports_count=ports_count,
+            services_count=services_count,
+            technologies_count=technologies_count,
+            emails_count=emails_count,
+            cloud_count=cloud_count,
+            api_count=api_count,
+            approved_count=approved_count,
+            shadow_count=shadow_count,
+            vuln_counts=vuln_counts,
+            vuln_contribution=vuln_contribution,
+            shadow_contribution=shadow_contribution,
+            service_contribution=service_contribution,
+            tech_contribution=tech_contribution,
+            port_contribution=port_contribution,
+            risk_score=risk_score,
+            risk_level=risk_level
+        )
     @app.route("/asi")
     @login_required
     def attack_surface_intelligence():
