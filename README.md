@@ -1,166 +1,143 @@
 # 🚀 ASIPROJECT
 
-### Attack Surface Intelligence Platform
+### የጥቃት ሜዳ መረጃ ፕላትፎርም (Attack Surface Intelligence Platform)
 https://github.com/weldemichealaderaw144-hash/ASIPROJECT.git
----Clone using URL:
+---ከURL በመጠቀም Clone ያድርጉ
 
-## 📌 Overview
+## 📌 አጠቃላይ እይታ
 
-**ASI Project** የሳይበር ደህንነት (Cyber Security) ፕላትፎርም ሲሆን ለ **reconnaissance**, **bug bounty**, እና **SOC analysis** የተሟላ መሳሪያዎችን ያቀርባል።
+ASI Project የሳይበር ደህንነት (Cyber Security) ፕላትፎርም ሲሆን ለ reconnaissance, bug bounty, እና SOC analysis የተሟላ መሳሪያዎችን ያቀርባል።
 
-It helps you **discover assets, analyze attack surface, and detect vulnerabilities** automatically.
-
----
-
-## 🔧 Tools Included
-
-* **subfinder** → Fast subdomain discovery
-* **amass** → Advanced attack surface mapping
-* **assetfinder** → Find domains & subdomains
-* **dnsx** → DNS resolution toolkit
-* **httpx** → HTTP probing & tech detection
-* **katana** → Web crawler & spider
-* **gau** → Get historical URLs
-* **nuclei** → Vulnerability scanner
-* **gowitness** → Screenshot tool *(pending)*
-* **whatweb** → Website technology detection
-* **theHarvester** → Emails & OSINT gathering
-* **wappalyzer** → Tech stack detection
+ይህ ፕላትፎርም የእርስዎን assets መፈለግ፣ የጥቃት ሜዳ ትንተና ማድረግ እና vulnerabilities መለየት በራሱ ያደርጋል።
 
 ---
 
-## ⚙️ Prerequisites
+## 🔧 የተካተቱ መሣሪያዎች
 
-Make sure you have installed:
-
-* Go
-* Python
-* Git
-* Node.js (npm)
-
----
-
-## 🐧 Kali Linux Installation
-
-```bash
-sudo apt update
-sudo apt install golang-go python3 python3-pip git npm -y
-```
-
-### Install Tools
-
-```bash
-go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
-go install -v github.com/OWASP/Amass/v3/...@master
-go install github.com/tomnomnom/assetfinder@latest
-go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest
-go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
-go install github.com/projectdiscovery/katana/cmd/katana@latest
-go install github.com/lc/gau/v2/cmd/gau@latest
-go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
-go install github.com/sensepost/gowitness@latest
-```
-
-### Other Tools
-
-```bash
-sudo apt install whatweb theharvester -y
-npm install -g wappalyzer
-```
-
-### Fix PATH
-
-```bash
-echo 'export PATH=$PATH:$HOME/go/bin' >> ~/.bashrc
-source ~/.bashrc
-```
+subfinder → ፈጣን subdomain መፈለጊያ  
+amass → የጥቃት ሜዳ ማስፋፊያ  
+assetfinder → domain እና subdomain መፈለጊያ  
+dnsx → DNS መሣሪያ  
+httpx → HTTP probing እና ቴክኖሎጂ መለያየት  
+katana → Web crawler  
+gau → ታሪካዊ URLs መሰብሰቢያ  
+nuclei → vulnerability scanner  
+gowitness → screenshot መሣሪያ (pending)  
+whatweb → የድህረገጽ ቴክኖሎጂ መለያየት  
+theHarvester → Email እና OSINT መረጃ  
+wappalyzer → Tech stack መለያየት  
 
 ---
 
-## 🪟 Windows Installation
+## ⚙️ ቅድመ ሁኔታዎች
 
-Install Go and ensure `%GOPATH%\\bin` is in PATH.
+እነዚህን አስቀድሞ ያጫኑ:
 
-```cmd
-go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
-go install -v github.com/OWASP/Amass/v3/...@master
-go install github.com/tomnomnom/assetfinder@latest
-go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest
-go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
-go install github.com/projectdiscovery/katana/cmd/katana@latest
-go install github.com/lc/gau/v2/cmd/gau@latest
-go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
-go install github.com/sensepost/gowitness@latest
-```
-
-💡 Tip: Use **WSL2 + Kali Linux** for better experience
+Go  
+Python  
+Git  
+Node.js (npm)  
 
 ---
 
-## ▶️ Usage Examples
+## 🐧 Kali Linux ላይ መጫን
 
-```bash
-# Subdomain discovery
-subfinder -d example.com -silent
+sudo apt update  
+sudo apt install golang-go python3 python3-pip git npm -y  
 
-# Attack surface mapping
-amass enum -d example.com
+### መሣሪያዎችን መጫን
 
-# Find URLs
-gau example.com
+go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest  
+go install -v github.com/OWASP/Amass/v3/...@master  
+go install github.com/tomnomnom/assetfinder@latest  
+go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest  
+go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest  
+go install github.com/projectdiscovery/katana/cmd/katana@latest  
+go install github.com/lc/gau/v2/cmd/gau@latest  
+go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest  
+go install github.com/sensepost/gowitness@latest  
 
-# Probe live hosts
-cat subdomains.txt | httpx -status-code -title
+### ሌሎች መሣሪያዎች
 
-# Vulnerability scan
-nuclei -u https://example.com -t cves/
-```
+sudo apt install whatweb theharvester -y  
+npm install -g wappalyzer  
+
+### PATH ማስተካከል
+
+echo 'export PATH=$PATH:$HOME/go/bin' >> ~/.bashrc  
+source ~/.bashrc  
 
 ---
 
-🧠 What is ASI?
+## 🪟 Windows ላይ መጫን
 
-Attack Surface Intelligence (ASI) ማለት የአንድ organization የሚታዩ እና የሚደርሱ የቴክኖሎጂ ንብረቶችን (assets) መሰብሰብ፣ መቆጣጠር እና አደጋ (risk) መገምገም ነው።
+Go አጫን እና %GOPATH%\bin ወደ PATH ያክሉ  
 
-📦 Assets Included
-Main Domain
-example.com, server.local
-Subdomains (comma-separated)
-api.example.com, dev.example.com
-Web Endpoints / URLs
-https://example.com/login
-https://example.com/admin
-Server IPs
-192.168.1.10, 10.0.0.5
-Open Ports
-22, 80, 443
-Services (format: service:port or name)
-nginx:80, apache:443, ssh
-Technologies (CMS, Frameworks, CDN)
-WordPress, React, Cloudflare
-Email Addresses
-admin@example.com, support@example.com
-Cloud Assets
-myapp-bucket, storage.azure.com
-(AWS S3, Azure Storage, GCP buckets)
-API Endpoints
-/api/v1/users, /api/auth/login
+go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest  
+go install -v github.com/OWASP/Amass/v3/...@master  
+go install github.com/tomnomnom/assetfinder@latest  
+go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest  
+go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest  
+go install github.com/projectdiscovery/katana/cmd/katana@latest  
+go install github.com/lc/gau/v2/cmd/gau@latest  
+go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest  
+go install github.com/sensepost/gowitness@latest  
 
-👉 Goal:
-መረጃዎቹን በአንድ ቦታ ማሰባሰብ፣ መከታተል (monitoring) እና የደህንነት አደጋዎችን መገምገም (risk assessment) ነው።
+💡 Tip: WSL2 + Kali Linux መጠቀም ይመከራል  
+
 ---
 
-## 🔐 Use Cases
+## ▶️ አጠቃቀም ምሳሌዎች
 
-* Bug Bounty Hunting
-* Red Team Recon
-* SOC Monitoring
-* Asset Inventory
+subfinder -d example.com -silent  
 
-----
+amass enum -d example.com  
 
-## 👨‍💻 Author
+gau example.com  
 
-**Weldemicheal 🇪🇹**
+cat subdomains.txt | httpx -status-code -title  
+
+nuclei -u https://example.com -t cves/  
+
+---
+
+## 🧠 ASI ምንድን ነው?
+
+Attack Surface Intelligence (ASI) ማለት የአንድ organization የሚታዩ እና የሚደርሱ ቴክኖሎጂ ንብረቶችን (assets) መሰብሰብ፣ መከታተል እና አደጋ መገምገም ነው።
+
+---
+
+## 📦 Assets
+
+Main Domain → example.com  
+Subdomains → api.example.com, dev.example.com  
+URLs → https://example.com/login  
+Server IPs → 192.168.1.10  
+Ports → 22, 80, 443  
+Services → nginx:80, apache:443  
+Technologies → WordPress, React, Cloudflare  
+Emails → admin@example.com  
+Cloud → AWS S3, Azure, GCP  
+API → /api/v1/users  
+
+---
+
+## 🎯 ዓላማ
+
+መረጃዎችን በአንድ ቦታ ማሰባሰብ፣ monitoring ማድረግ እና የደህንነት አደጋ መገምገም ነው።
+
+---
+
+## 🔐 አጠቃቀም
+
+Bug Bounty  
+Red Team Recon  
+SOC Monitoring  
+Asset Inventory  
+
+---
+
+## 👨‍💻 ደራሲ
+
+Weldemicheal 🇪🇹  
 Cyber Security Enthusiast
-
