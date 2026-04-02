@@ -2,14 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Shadow Assets</title>
+    <title data-i18n="shadowTitle">Shadow Assets</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        body { padding-top: 60px; }
+        body { 
+            background-color: #0a0e12;
+            color: #e0e4e8;
+            padding-top: 60px; 
+            font-family: 'Inter', sans-serif;
+        }
+        .navbar.bg-dark {
+            background-color: #0f1419 !important;
+            border-bottom: 1px solid #1e2a32;
+        }
+        .navbar-brand {
+            color: #f68b1f !important;
+        }
         .badge-shadow { background-color: #ffc107; color: #212529; }
         .badge-approved { background-color: #198754; color: #fff; }
         .badge-rejected { background-color: #dc3545; color: #fff; }
-        .table-hover tbody tr:hover { background-color: #f1f1f1; }
+        .table-hover tbody tr:hover { background-color: #1e2a32 !important; }
         .version-badge {
             font-size: 0.85em;
             background-color: #6c757d;
@@ -18,63 +31,113 @@
             border-radius: 4px;
             margin-left: 5px;
         }
+        .table {
+            color: #e0e4e8;
+            background-color: transparent;
+        }
+        .table thead th {
+            background-color: #141b21;
+            border-color: #1e2a32;
+            color: #8899a6;
+        }
+        .table td {
+            border-color: #1e2a32;
+            vertical-align: middle;
+        }
+        .btn-outline-shodan {
+            border: 1px solid #2c3a47;
+            color: #b6c2cd;
+            background: transparent;
+            transition: all 0.2s;
+        }
+        .btn-outline-shodan:hover {
+            border-color: #f68b1f;
+            color: #f68b1f;
+            background-color: rgba(246,139,31,0.1);
+        }
+        .lang-selector {
+            background: transparent;
+            border: 1px solid #f68b1f;
+            color: #f68b1f;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 0.5rem;
+        }
+        .lang-selector option {
+            background: #0a0e12;
+            color: #f68b1f;
+        }
+        .btn-secondary {
+            background-color: #1f2a33;
+            border-color: #2c3a47;
+            color: #b6c2cd;
+        }
+        .btn-secondary:hover {
+            background-color: #2c3a47;
+            border-color: #f68b1f;
+            color: #f68b1f;
+        }
+        .alert-info {
+            background-color: #141b21;
+            border-color: #1e2a32;
+            color: #68a2cf;
+        }
     </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container-fluid">
-        <a class="navbar-brand"
-           href="{% if session.get('role') == 'admin' %}
-                   {{ url_for('dashboard') }}
-                 {% else %}
-                   {{ url_for('analyst_dashboard') }}
-                 {% endif %}">
-            Shadow Assets
+        <a class="navbar-brand" href="{% if session.get('role') == 'admin' %}{{ url_for('dashboard') }}{% else %}{{ url_for('analyst_dashboard') }}{% endif %}">
+            <i class="bi bi-shield-shaded"></i> <span data-i18n="shadowTitle">Shadow Assets</span>
         </a>
-
-        <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
-            </li>
-        </ul>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <select id="languageSwitcher" class="lang-selector">
+                        <option value="en">English</option>
+                        <option value="am">አማርኛ</option>
+                    </select>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> <span data-i18n="logout">Logout</span></a>
+                </li>
+            </ul>
+        </div>
     </div>
 </nav>
 
 <div class="container mt-4">
-
-    <a class="btn btn-secondary mb-3"
-       href="{% if session.get('role') == 'admin' %}
-               {{ url_for('dashboard') }}
-             {% else %}
-               {{ url_for('analyst_dashboard') }}
-             {% endif %}">
-        ← Back to Dashboard
+    <a class="btn btn-secondary mb-3" href="{% if session.get('role') == 'admin' %}{{ url_for('dashboard') }}{% else %}{{ url_for('analyst_dashboard') }}{% endif %}">
+        <i class="bi bi-arrow-left"></i> <span data-i18n="backToDashboard">Back to Dashboard</span>
     </a>
 
-    <h2>Shadow Assets</h2>
-    <p class="text-muted">
-        Assets detected outside approved inventory.
-    </p>
+    <h2 data-i18n="shadowTitle">Shadow Assets</h2>
+    <p class="text-muted" data-i18n="shadowDesc">Assets detected outside approved inventory.</p>
 
     <div class="table-responsive">
         <table class="table table-bordered table-striped table-hover">
             <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Main Domain</th>
-                <th>Type</th>
-                <th>Value</th>
-                <th>Version</th>
-                <th>Discovered By</th>
-                <th>Status</th>
-                {% if session.get('role') == 'admin' %}
-                    <th>Actions</th>
-                {% endif %}
-                <th>Created</th>
-            </tr>
+                <tr>
+                    <th data-i18n="id">ID</th>
+                    <th data-i18n="mainDomain">Main Domain</th>
+                    <th data-i18n="typeCol">Type</th>
+                    <th data-i18n="valueCol">Value</th>
+                    <th data-i18n="version">Version</th>
+                    <th data-i18n="discoveredByCol">Discovered By</th>
+                    <th data-i18n="statusCol">Status</th>
+                    {% if session.get('role') == 'admin' %}
+                        <th data-i18n="actionsCol">Actions</th>
+                    {% endif %}
+                    <th data-i18n="createdCol">Created</th>
+                </tr>
             </thead>
-
             <tbody>
             {% for shadow in shadows %}
             <tr>
@@ -98,32 +161,23 @@
                     {% endif %}
                 </td>
                 <td>{{ shadow.discovered_by or "system" }}</td>
-
                 <td>
                     {% if shadow.status == 'approved' %}
-                        <span class="badge badge-approved">Approved</span>
+                        <span class="badge badge-approved" data-i18n="approved">Approved</span>
                     {% elif shadow.status == 'rejected' %}
-                        <span class="badge badge-rejected">Rejected</span>
+                        <span class="badge badge-rejected" data-i18n="rejected">Rejected</span>
                     {% else %}
-                        <span class="badge badge-shadow">Shadow</span>
+                        <span class="badge badge-shadow" data-i18n="shadow">Shadow</span>
                     {% endif %}
                 </td>
-
                 {% if session.get('role') == 'admin' %}
                 <td>
                     {% if shadow.status == 'shadow' %}
-                        <a href="{{ url_for('approve_shadow', item_id=shadow.id) }}"
-                           class="btn btn-success btn-sm">
-                            Approve
-                        </a>
-                        <a href="{{ url_for('reject_shadow', item_id=shadow.id) }}"
-                           class="btn btn-danger btn-sm">
-                            Reject
-                        </a>
+                        <a href="{{ url_for('approve_shadow', item_id=shadow.id) }}" class="btn btn-success btn-sm" data-i18n="approve">Approve</a>
+                        <a href="{{ url_for('reject_shadow', item_id=shadow.id) }}" class="btn btn-danger btn-sm" data-i18n="reject">Reject</a>
                     {% endif %}
                 </td>
                 {% endif %}
-
                 <td>{{ shadow.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
             </tr>
             {% endfor %}
@@ -132,26 +186,25 @@
     </div>
 
     {% if not shadows %}
-        <div class="alert alert-info">No shadow assets found.</div>
+        <div class="alert alert-info" data-i18n="noShadows">No shadow assets found.</div>
     {% endif %}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-      <script src="/static/js/i18n.js"></script>
-    <script>
-        // Initialize language switcher
-        const langSelect = document.getElementById('languageSwitcher');
-        if (langSelect) {
-            const savedLang = localStorage.getItem('asi_lang') || 'en';
-            langSelect.value = savedLang;
-            if (typeof applyLanguage === 'function') applyLanguage();
+<script src="/static/js/i18n.js"></script>
+<script>
+    // Initialize language switcher
+    const langSelect = document.getElementById('languageSwitcher');
+    if (langSelect) {
+        const savedLang = localStorage.getItem('asi_lang') || 'en';
+        langSelect.value = savedLang;
+        if (typeof applyLanguage === 'function') applyLanguage();
 
-            langSelect.addEventListener('change', (e) => {
-                localStorage.setItem('asi_lang', e.target.value);
-                if (typeof applyLanguage === 'function') applyLanguage();
-            });
-        }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        langSelect.addEventListener('change', (e) => {
+            localStorage.setItem('asi_lang', e.target.value);
+            if (typeof applyLanguage === 'function') applyLanguage();
+        });
+    }
+</script>
 </body>
 </html>
