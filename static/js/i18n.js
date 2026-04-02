@@ -1,0 +1,297 @@
+// static/js/i18n.js
+
+const translations = {
+    en: {
+        // === Login page ===
+        pageTitle: "ASI Secure Terminal",
+        terminalHeader: "Initializing ASI Security Terminal...",
+        promptUsername: "> Enter Username",
+        promptPassword: "> Enter Password",
+        loginButton: "EXECUTE LOGIN",
+        footerText: "ASI • Asset Security Intelligence System",
+
+        // === Common navbar & buttons ===
+        brand: "Attack Surface Intel",
+        adminLabel: "Admin",
+        addAsset: "Add Asset",
+        users: "Users",
+        logs: "Logs",
+        asiIntel: "ASI Intel",
+        logout: "Logout",
+        monitoringStatus: "Monitoring",
+        toggleSchedule: "Pause",
+        resumeSchedule: "Resume",
+        runNow: "run now",
+        viewAsset: "View Asset",
+        report: "Report",
+        stopScan: "Stop Scan",
+        startScan: "Start Scan",
+        editAsset: "Edit Asset",
+        deleteAsset: "Delete",
+        // Dashboard table headers
+        thId: "ID",
+        thDomain: "Domain",
+        thCreated: "Created",
+        thApprovedShadow: "Approved / Shadow",
+        thRiskSeverity: "Risk & Severity",
+        thScanProgress: "Scan Progress",
+        thMonitoring: "Monitoring",
+        thActions: "Actions",
+        approvedCount: "Approved",
+        shadowCount: "Shadow",
+        filterPlaceholder: "Filter by domain, IP, or tag...",
+        applyFilter: "Apply",
+        // Add asset page
+        pageTitleAdd: "Add New Asset",
+        mainDomainLabel: "Main Domain",
+        mainDomainPlaceholder: "example.com or server.local",
+        subdomainsLabel: "Subdomains",
+        subdomainsPlaceholder: "api.example.com, dev.example.com",
+        commaHint: "Comma‑separated",
+        urlsLabel: "Web Endpoints / URLs",
+        urlsPlaceholder: "https://example.com/login, https://example.com/admin",
+        ipsLabel: "Server IPs",
+        ipsPlaceholder: "192.168.1.10, 10.0.0.5",
+        portsLabel: "Open Ports",
+        portsPlaceholder: "22, 80, 443",
+        servicesLabel: "Services",
+        servicesPlaceholder: "nginx:80, apache:443, ssh",
+        servicesHint: "Format: ",
+        orServiceName: "or service name",
+        technologiesLabel: "Technologies",
+        technologiesPlaceholder: "WordPress, React, Cloudflare",
+        technologiesHint: "CMS, Frameworks, CDN, etc.",
+        emailsLabel: "Email Addresses",
+        emailsPlaceholder: "admin@example.com, support@example.com",
+        cloudLabel: "Cloud Assets",
+        cloudPlaceholder: "myapp-bucket, storage.azure.com",
+        cloudHint: "S3 buckets, Azure storage, GCP buckets",
+        apiLabel: "API Endpoints",
+        apiPlaceholder: "https://api.example.com/v1",
+        apiHint: "Full API URLs",
+        registerButton: "Register Asset",
+        backButton: "Back",
+        // Add user page
+        pageTitleAddUser: "Add New User",
+        usernameLabel: "Username",
+        passwordLabel: "Password",
+        roleLabel: "Role",
+        createUser: "Create User",
+        cancel: "Cancel",
+        // Activity logs
+        pageTitleLogs: "Activity Logs",
+        clearLogs: "Clear Logs",
+        thTimestamp: "Timestamp",
+        thUser: "User",
+        thRole: "Role",
+        thAction: "Action",
+        thTarget: "Target",
+        thStatus: "Status",
+        thSeverity: "Severity",
+        thIp: "IP",
+        // ASI Intel page
+        pageTitleIntel: "Attack Surface Intelligence",
+        pageSubtitleIntel: "Assets · Risk Analysis · Discovery",
+        refresh: "Refresh",
+        export: "Export",
+        totalAssets: "Total Assets",
+        domainsSubdomains: "Domains + Subdomains",
+        urlsApis: "URLs + APIs",
+        shadowAssets: "Shadow Assets",
+        averageRisk: "Average Risk Score",
+        totalVulns: "Total Vulnerabilities",
+        highestRisk: "Highest Risk Score",
+        lowRiskAssets: "Low Risk Assets",
+        services: "Services",
+        technologies: "Technologies",
+        emails: "Emails",
+        cloudAssets: "Cloud Assets",
+        apiEndpoints: "API Endpoints",
+        openPorts: "Open Ports",
+        statusDistribution: "Status Distribution",
+        riskDistribution: "Risk Score Distribution",
+        topRiskAssets: "Top Risk Assets",
+        assetBreakdown: "Asset Breakdown by Type",
+        discoveryTools: "Discovery Tools & Risk Factors",
+        recentDiscoveries: "Recent Discoveries",
+        // Asset dashboard
+        assetDashboardTitle: "Asset Dashboard",
+        inventory: "Inventory",
+        vulnerabilities: "Vulnerabilities",
+        scanHistory: "Scan History",
+        // Report page
+        reportTitle: "Asset Security Report",
+        overallRisk: "Overall Risk Assessment",
+        attackSurfaceInventory: "Attack Surface Inventory",
+        riskBreakdown: "Risk Score Breakdown",
+        completeInventory: "Complete Asset Inventory",
+        print: "Print / Save as PDF",
+        // Shadow assets page
+        shadowTitle: "Shadow Assets",
+        shadowDesc: "Assets detected outside approved inventory.",
+        // Vulnerabilities page
+        vulnTitle: "Vulnerabilities",
+        vulnFound: "Found vulnerabilities",
+        analystNotes: "Analyst Notes",
+        addNote: "Add analyst note..."
+    },
+    am: {
+        // === Login page ===
+        pageTitle: "ASI ደህንነት ተርሚናል",
+        terminalHeader: "የASI ደህንነት ተርሚናል በመጀመር ላይ...",
+        promptUsername: "> የተጠቃሚ ስም ያስገቡ",
+        promptPassword: "> የይለፍ ቃል ያስገቡ",
+        loginButton: "ግባ ፈጽም",
+        footerText: "ASI • የንብረት ደህንነት መረጃ ስርዓት",
+
+        // === Common navbar & buttons ===
+        brand: "Attack Surface Intel",
+        adminLabel: "አስተዳዳሪ",
+        addAsset: "ንብረት ጨምር",
+        users: "ተጠቃሚዎች",
+        logs: "መዝገቦች",
+        asiIntel: "ASI መረጃ",
+        logout: "ውጣ",
+        monitoringStatus: "ክትትል",
+        toggleSchedule: "አቁም",
+        resumeSchedule: "ቀጥል",
+        runNow: "አሁን ሩጥ",
+        viewAsset: "ንብረት ተመልከት",
+        report: "ሪፖርት",
+        stopScan: "ቅኝት አቁም",
+        startScan: "ቅኝት ጀምር",
+        editAsset: "ንብረት አርትዕ",
+        deleteAsset: "ሰርዝ",
+        // Dashboard table headers
+        thId: "መታወቂያ",
+        thDomain: "ዶሜይን",
+        thCreated: "ተፈጠረ",
+        thApprovedShadow: "የፀደቀ / ጥላ",
+        thRiskSeverity: "አደጋ እና ክብደት",
+        thScanProgress: "የቅኝት ሂደት",
+        thMonitoring: "ክትትል",
+        thActions: "ድርጊቶች",
+        approvedCount: "የፀደቀ",
+        shadowCount: "ጥላ",
+        filterPlaceholder: "በዶሜይን፣ አይፒ ወይም መለያ አጣራ",
+        applyFilter: "ተግብር",
+        // Add asset page
+        pageTitleAdd: "አዲስ ንብረት ጨምር",
+        mainDomainLabel: "ዋና ዶሜይን",
+        mainDomainPlaceholder: "ምሳሌ: example.com",
+        subdomainsLabel: "ንዑስ ዶሜይኖች",
+        subdomainsPlaceholder: "api.example.com, dev.example.com",
+        commaHint: "በነጠላ ሰረዝ ይለዩ",
+        urlsLabel: "ድረ ገፆች / URLs",
+        urlsPlaceholder: "https://example.com/login",
+        ipsLabel: "አገልጋይ አይፒዎች",
+        ipsPlaceholder: "192.168.1.10, 10.0.0.5",
+        portsLabel: "ክፍት ወደቦች",
+        portsPlaceholder: "22, 80, 443",
+        servicesLabel: "አገልግሎቶች",
+        servicesPlaceholder: "nginx:80, apache:443",
+        servicesHint: "ቅርጸት: ",
+        orServiceName: "ወይም የአገልግሎት ስም",
+        technologiesLabel: "ቴክኖሎጂዎች",
+        technologiesPlaceholder: "WordPress, React, Cloudflare",
+        technologiesHint: "CMS፣ ማዕቀፎች፣ ሲዲኤን፣ ወዘተ",
+        emailsLabel: "ኢሜይል አድራሻዎች",
+        emailsPlaceholder: "admin@example.com, support@example.com",
+        cloudLabel: "ደመና ንብረቶች",
+        cloudPlaceholder: "myapp-bucket, storage.azure.com",
+        cloudHint: "የS3 ባልዲዎች፣ የAzure ማከማቻ፣ የGCP ባልዲዎች",
+        apiLabel: "API ጫፎች",
+        apiPlaceholder: "https://api.example.com/v1",
+        apiHint: "ሙሉ API URLs",
+        registerButton: "ንብረት ይመዝገቡ",
+        backButton: "ተመለስ",
+        // Add user page
+        pageTitleAddUser: "አዲስ ተጠቃሚ ጨምር",
+        usernameLabel: "የተጠቃሚ ስም",
+        passwordLabel: "የይለፍ ቃል",
+        roleLabel: "ሚና",
+        createUser: "ተጠቃሚ ፍጠር",
+        cancel: "ሰርዝ",
+        // Activity logs
+        pageTitleLogs: "የእንቅስቃሴ መዝገቦች",
+        clearLogs: "መዝገቦችን አጽዳ",
+        thTimestamp: "የጊዜ ማህተም",
+        thUser: "ተጠቃሚ",
+        thRole: "ሚና",
+        thAction: "ድርጊት",
+        thTarget: "ዒላማ",
+        thStatus: "ሁኔታ",
+        thSeverity: "ክብደት",
+        thIp: "አይፒ",
+        // ASI Intel page
+        pageTitleIntel: "Attack Surface Intelligence",
+        pageSubtitleIntel: "ንብረቶች · ስጋት ትንተና · ግኝት",
+        refresh: "አድስ",
+        export: "ላክ",
+        totalAssets: "ጠቅላላ ንብረቶች",
+        domainsSubdomains: "ዶሜይኖች + ንዑስ ዶሜይኖች",
+        urlsApis: "URLs + APIs",
+        shadowAssets: "ጥላ ንብረቶች",
+        averageRisk: "አማካይ ስጋት ነጥብ",
+        totalVulns: "ጠቅላላ ተጋላጭነቶች",
+        highestRisk: "ከፍተኛው ስጋት ነጥብ",
+        lowRiskAssets: "ዝቅተኛ ስጋት ንብረቶች",
+        services: "አገልግሎቶች",
+        technologies: "ቴክኖሎጂዎች",
+        emails: "ኢሜይሎች",
+        cloudAssets: "የደመና ንብረቶች",
+        apiEndpoints: "API ጫፎች",
+        openPorts: "ክፍት ወደቦች",
+        statusDistribution: "የሁኔታ ስርጭት",
+        riskDistribution: "የስጋት ነጥብ ስርጭት",
+        topRiskAssets: "ከፍተኛ ስጋት ንብረቶች",
+        assetBreakdown: "በአይነት የንብረት ክፍፍል",
+        discoveryTools: "የግኝት መሳሪያዎች እና ስጋት ምክንያቶች",
+        recentDiscoveries: "የቅርብ ጊዜ ግኝቶች",
+        // Asset dashboard
+        assetDashboardTitle: "የንብረት ዳሽቦርድ",
+        inventory: "ንብረት ዝርዝር",
+        vulnerabilities: "ተጋላጭነቶች",
+        scanHistory: "የቅኝት ታሪክ",
+        // Report page
+        reportTitle: "የንብረት ደህንነት ሪፖርት",
+        overallRisk: "አጠቃላይ ስጋት ግምገማ",
+        attackSurfaceInventory: "የጥቃት ወለል ንብረት ዝርዝር",
+        riskBreakdown: "የስጋት ነጥብ ክፍፍል",
+        completeInventory: "ሙሉ የንብረት ዝርዝር",
+        print: "አትም / እንደ PDF አስቀምጥ",
+        // Shadow assets page
+        shadowTitle: "ጥላ ንብረቶች",
+        shadowDesc: "ከተፈቀደ ንብረት ውጭ የተገኙ ንብረቶች።",
+        // Vulnerabilities page
+        vulnTitle: "ተጋላጭነቶች",
+        vulnFound: "ተጋላጭነቶች ተገኝተዋል",
+        analystNotes: "የተንታኝ ማስታወሻዎች",
+        addNote: "የተንታኝ ማስታወሻ ያክሉ..."
+    }
+};
+
+// Apply current language to all elements with data-i18n attribute
+function applyLanguage() {
+    const lang = localStorage.getItem('asi_lang') || 'en';
+    const t = translations[lang] || translations.en;
+
+    // Update all elements that have data-i18n="key"
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key] !== undefined) {
+            // If the element is an input placeholder
+            if (el.tagName === 'INPUT' && el.hasAttribute('placeholder')) {
+                el.placeholder = t[key];
+            } else {
+                el.innerText = t[key];
+            }
+        }
+    });
+
+    // Also handle HTML title
+    if (t.pageTitle) document.title = t.pageTitle;
+}
+
+// On every page load, apply the language
+document.addEventListener('DOMContentLoaded', applyLanguage);
