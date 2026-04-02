@@ -136,10 +136,7 @@ body{
 <div class="terminal">
 
 <!-- Language dropdown -->
-<select id="languageSelect" class="lang-selector">
-    <option value="en">English</option>
-    <option value="am">አማርኛ</option>
-</select>
+
 
 <div id="terminalHeader" class="terminal-header typing">
 Initializing ASI Security Terminal...
@@ -173,49 +170,7 @@ ASI • Asset Security Intelligence System
 
 <script>
 // Translation strings
-const translations = {
-    en: {
-        header: "Initializing ASI Security Terminal...",
-        promptUsername: "> Enter Username",
-        promptPassword: "> Enter Password",
-        button: "EXECUTE LOGIN",
-        footer: "ASI • Asset Security Intelligence System"
-    },
-    am: {
-        header: "የASI ደህንነት ተርሚናል እየጀመረ ነው...",
-        promptUsername: "> የተጠቃሚ ስም ያስገቡ",
-        promptPassword: "> የይለፍ ቃል ያስገቡ",
-        button: "ግባ",
-        footer: "ASI • የንብረት ደህንነት መረጃ ሥርዓት"
-    }
-};
 
-function setLanguage(lang) {
-    const t = translations[lang];
-    if (!t) return;
-    
-    // Update text content
-    document.getElementById('terminalHeader').textContent = t.header;
-    document.getElementById('promptUsername').textContent = t.promptUsername;
-    document.getElementById('promptPassword').textContent = t.promptPassword;
-    document.getElementById('loginButton').textContent = t.button;
-    document.getElementById('footerText').textContent = t.footer;
-    
-    // Restart typing animation by toggling class
-    const headerEl = document.getElementById('terminalHeader');
-    headerEl.classList.remove('typing');
-    void headerEl.offsetWidth; // force reflow
-    headerEl.classList.add('typing');
-}
-
-// Event listener for language dropdown
-document.getElementById('languageSelect').addEventListener('change', function(e) {
-    setLanguage(e.target.value);
-});
-
-// Set default language (English)
-setLanguage('en');
-</script>
 
 </body>
 </html>
