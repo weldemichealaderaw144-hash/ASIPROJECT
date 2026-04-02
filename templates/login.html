@@ -8,6 +8,26 @@
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
 <style>
+    <script src="/static/js/i18n.js"></script>
+<script>
+    const langSelect = document.getElementById('languageSwitcher');
+    // Set initial value from localStorage
+    const savedLang = localStorage.getItem('asi_lang') || 'en';
+    langSelect.value = savedLang;
+    // Apply language (i18n.js already does it on DOMContentLoaded)
+    // But we need to apply immediately because the script loads after DOM
+    if (typeof applyLanguage === 'function') applyLanguage();
+
+    langSelect.addEventListener('change', (e) => {
+        localStorage.setItem('asi_lang', e.target.value);
+        applyLanguage();
+        // Restart typing animation if needed (optional)
+        const header = document.querySelector('.terminal-header');
+        header.classList.remove('typing');
+        void header.offsetWidth;
+        header.classList.add('typing');
+    });
+</script>
 body{
     background:black;
     font-family: 'Share Tech Mono', monospace;
