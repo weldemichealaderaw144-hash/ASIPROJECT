@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ asset_type|capitalize }} Inventory</title>
+    <title data-i18n="inventoryTitle">{{ asset_type|capitalize }} Inventory</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
@@ -10,11 +10,32 @@
             background: #0a0e1a;
             color: #eaeaea;
             padding-top: 60px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
         .navbar {
             background: #141b2b;
             border-bottom: 2px solid #00ff9d;
+        }
+
+        .navbar-brand {
+            color: #00ff9d !important;
+        }
+
+        .lang-selector {
+            background: transparent;
+            border: 1px solid #00ff9d;
+            color: #00ff9d;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 0.5rem;
+        }
+        .lang-selector option {
+            background: #141b2b;
+            color: #00ff9d;
         }
 
         .card {
@@ -59,74 +80,103 @@
             border-radius: 8px;
             margin-bottom: 20px;
         }
+        .stats-card small {
+            color: #8899a6;
+        }
+        .text-success {
+            color: #3fb68b !important;
+        }
+        .text-warning {
+            color: #f6c445 !important;
+        }
+        .text-info {
+            color: #68a2cf !important;
+        }
+        a.text-info:hover {
+            color: #f68b1f !important;
+        }
+        .btn-success {
+            background-color: #198754;
+            border-color: #198754;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ url_for('attack_surface_intelligence') }}">
-                <i class="bi bi-arrow-left"></i> Back to ASI
+                <i class="bi bi-arrow-left"></i> <span data-i18n="backToASI">Back to ASI</span>
             </a>
-            <span class="navbar-text text-light">
-                {{ asset_type|capitalize }} Inventory ({{ count }} total)
-            </span>
+            <div class="ms-auto d-flex align-items-center">
+                <span class="navbar-text text-light me-3">
+                    <span data-i18n="inventoryLabel">{{ asset_type|capitalize }} Inventory</span> ({{ count }} total)
+                </span>
+                <select id="languageSwitcher" class="lang-selector">
+                    <option value="en">English</option>
+                    <option value="am">አማርኛ</option>
+                </select>
+            </div>
         </div>
     </nav>
 
     <div class="container-fluid px-4">
-        <!-- Stats -->
+        <!-- Stats Cards -->
         <div class="row mt-4">
             <div class="col-md-3">
                 <div class="stats-card">
                     <i class="bi {{ icon_map.get(asset_type, 'bi-grid-3x3-gap-fill') }} type-icon"></i>
                     <h3>{{ count }}</h3>
-                    <small>Total {{ asset_type|capitalize }}s</small>
+                    <small><span data-i18n="totalCountLabel">Total</span> {{ asset_type|capitalize }}s</small>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stats-card">
                     <i class="bi bi-check-circle-fill text-success type-icon"></i>
                     <h3>{{ inventory|selectattr('status', 'equalto', 'approved')|list|length }}</h3>
-                    <small>Approved</small>
+                    <small data-i18n="approvedLabel">Approved</small>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stats-card">
                     <i class="bi bi-exclamation-triangle-fill text-warning type-icon"></i>
                     <h3>{{ inventory|selectattr('status', 'equalto', 'shadow')|list|length }}</h3>
-                    <small>Shadow</small>
+                    <small data-i18n="shadowLabel">Shadow</small>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stats-card">
                     <i class="bi bi-diagram-2 text-info type-icon"></i>
                     <h3>{{ by_asset|length }}</h3>
-                    <small>Parent Assets</small>
+                    <small data-i18n="parentAssetsLabel">Parent Assets</small>
                 </div>
             </div>
         </div>
 
-        <!-- Main Content -->
+        <!-- Main Inventory Table -->
         <div class="row">
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <i class="bi bi-list"></i> All {{ asset_type|capitalize }}s
+                        <i class="bi bi-list"></i> <span data-i18n="allItemsHeader">All</span> {{ asset_type|capitalize }}s
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Value</th>
+                                        <th data-i18n="valueCol">Value</th>
                                         {% if asset_type in ['service', 'technology'] %}
-                                        <th>Version</th>
+                                        <th data-i18n="versionCol">Version</th>
                                         {% endif %}
-                                        <th>Parent Asset</th>
-                                        <th>Status</th>
-                                        <th>Discovered By</th>
-                                        <th>Created At</th>
-                                        <th>Actions</th>
+                                        <th data-i18n="parentAssetCol">Parent Asset</th>
+                                        <th data-i18n="statusCol">Status</th>
+                                        <th data-i18n="discoveredByCol">Discovered By</th>
+                                        <th data-i18n="createdAtCol">Created At</th>
+                                        <th data-i18n="actionsCol">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -152,13 +202,15 @@
                                                 <a href="{{ url_for('asset_dashboard', asset_id=asset.id) }}" class="text-success">
                                                     {{ asset.domain }}
                                                 </a>
+                                            {% else %}
+                                                <span class="text-secondary" data-i18n="orphanLabel">Orphan</span>
                                             {% endif %}
                                         </td>
                                         <td>
                                             {% if item.status == 'approved' %}
-                                                <span class="badge badge-approved">Approved</span>
+                                                <span class="badge badge-approved" data-i18n="approvedStatus">Approved</span>
                                             {% else %}
-                                                <span class="badge badge-shadow">Shadow</span>
+                                                <span class="badge badge-shadow" data-i18n="shadowStatus">Shadow</span>
                                             {% endif %}
                                         </td>
                                         <td>{{ item.discovered_by }}</td>
@@ -183,12 +235,12 @@
             </div>
         </div>
 
-        <!-- Grouped by Asset -->
+        <!-- Grouped by Parent Asset -->
         <div class="row mt-4">
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <i class="bi bi-diagram-2"></i> Grouped by Parent Asset
+                        <i class="bi bi-diagram-2"></i> <span data-i18n="groupedByAssetHeader">Grouped by Parent Asset</span>
                     </div>
                     <div class="card-body">
                         {% for asset_name, items in by_asset.items() %}
@@ -198,12 +250,12 @@
                                 <table class="table table-sm">
                                     <thead>
                                         <tr>
-                                            <th>Value</th>
+                                            <th data-i18n="valueCol">Value</th>
                                             {% if asset_type in ['service', 'technology'] %}
-                                            <th>Version</th>
+                                            <th data-i18n="versionCol">Version</th>
                                             {% endif %}
-                                            <th>Status</th>
-                                            <th>Discovered</th>
+                                            <th data-i18n="statusCol">Status</th>
+                                            <th data-i18n="discoveredCol">Discovered</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -215,9 +267,9 @@
                                             {% endif %}
                                             <td>
                                                 {% if item.status == 'approved' %}
-                                                    <span class="badge bg-success">Approved</span>
+                                                    <span class="badge bg-success" data-i18n="approvedStatus">Approved</span>
                                                 {% else %}
-                                                    <span class="badge bg-warning text-dark">Shadow</span>
+                                                    <span class="badge bg-warning text-dark" data-i18n="shadowStatus">Shadow</span>
                                                 {% endif %}
                                             </td>
                                             <td>{{ item.created_at.strftime('%Y-%m-%d') }}</td>
@@ -235,10 +287,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Optional: you can add any JavaScript here if needed.
-    </script>
-      <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/i18n.js"></script>
     <script>
         // Initialize language switcher
         const langSelect = document.getElementById('languageSwitcher');
@@ -253,6 +302,5 @@
             });
         }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
