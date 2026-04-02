@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Asset Relationship Map</title>
+    <title data-i18n="assetMapTitle">Asset Relationship Map</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
@@ -24,6 +24,23 @@
             top: 0;
             width: 100%;
             z-index: 1000;
+        }
+
+        /* Language selector in navbar */
+        .lang-selector {
+            background: transparent;
+            border: 1px solid #00ff9d;
+            color: #00ff9d;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 0.5rem;
+        }
+        .lang-selector option {
+            background: #141b2b;
+            color: #00ff9d;
         }
 
         #mynetwork {
@@ -104,17 +121,28 @@
             color: white;
             max-width: 300px;
         }
+
+        .table {
+            color: #eaeaea;
+        }
+        .badge {
+            font-size: 0.7rem;
+        }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ url_for('attack_surface_intelligence') }}">
-                <i class="bi bi-diagram-3"></i> Asset Relationship Map
+                <i class="bi bi-diagram-3"></i> <span data-i18n="assetMapTitle">Asset Relationship Map</span>
             </a>
             <div class="navbar-nav ms-auto">
+                <select id="languageSwitcher" class="lang-selector">
+                    <option value="en">English</option>
+                    <option value="am">አማርኛ</option>
+                </select>
                 <a class="nav-link" href="{{ url_for('attack_surface_intelligence') }}">
-                    <i class="bi bi-arrow-left"></i> Back to ASI
+                    <i class="bi bi-arrow-left"></i> <span data-i18n="backToASI">Back to ASI</span>
                 </a>
             </div>
         </div>
@@ -123,62 +151,64 @@
     <div id="mynetwork"></div>
 
     <div class="legend">
-        <h6><i class="bi bi-palette"></i> Legend</h6>
+        <h6><i class="bi bi-palette"></i> <span data-i18n="legend">Legend</span></h6>
         <div class="legend-item">
             <div class="legend-color asset-type"></div>
-            <span>Asset (Domain)</span>
+            <span data-i18n="assetType">Asset (Domain)</span>
         </div>
         <div class="legend-item">
             <div class="legend-color subdomain-type"></div>
-            <span>Subdomain</span>
+            <span data-i18n="subdomainType">Subdomain</span>
         </div>
         <div class="legend-item">
             <div class="legend-color url-type"></div>
-            <span>URL</span>
+            <span data-i18n="urlType">URL</span>
         </div>
         <div class="legend-item">
             <div class="legend-color ip-type"></div>
-            <span>IP Address</span>
+            <span data-i18n="ipType">IP Address</span>
         </div>
         <div class="legend-item">
             <div class="legend-color port-type"></div>
-            <span>Port</span>
+            <span data-i18n="portType">Port</span>
         </div>
-        <!-- New types -->
         <div class="legend-item">
             <div class="legend-color service-type"></div>
-            <span>Service</span>
+            <span data-i18n="serviceType">Service</span>
         </div>
         <div class="legend-item">
             <div class="legend-color technology-type"></div>
-            <span>Technology</span>
+            <span data-i18n="technologyType">Technology</span>
         </div>
         <div class="legend-item">
             <div class="legend-color email-type"></div>
-            <span>Email</span>
+            <span data-i18n="emailType">Email</span>
         </div>
         <div class="legend-item">
             <div class="legend-color cloud_asset-type"></div>
-            <span>Cloud Asset</span>
+            <span data-i18n="cloudAssetType">Cloud Asset</span>
         </div>
         <div class="legend-item">
             <div class="legend-color api_endpoint-type"></div>
-            <span>API Endpoint</span>
+            <span data-i18n="apiEndpointType">API Endpoint</span>
         </div>
     </div>
 
     <div class="stats-bar" id="stats">
-        <h6><i class="bi bi-bar-chart"></i> Statistics</h6>
-        <div>Total Nodes: <span id="nodeCount">0</span></div>
-        <div>Total Connections: <span id="edgeCount">0</span></div>
+        <h6><i class="bi bi-bar-chart"></i> <span data-i18n="statistics">Statistics</span></h6>
+        <div><span data-i18n="totalNodes">Total Nodes</span>: <span id="nodeCount">0</span></div>
+        <div><span data-i18n="totalConnections">Total Connections</span>: <span id="edgeCount">0</span></div>
     </div>
 
     <div class="info-panel" id="infoPanel">
-        <h5 id="infoTitle">Node Information</h5>
+        <h5 id="infoTitle" data-i18n="nodeInfo">Node Information</h5>
         <div id="infoContent"></div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/i18n.js"></script>
     <script>
+        // --- vis.js graph initialization (unchanged except translation of dynamic labels can be handled later if needed) ---
         var nodes = new vis.DataSet({{ nodes | safe }});
         var edges = new vis.DataSet({{ links | safe }});
 
@@ -266,7 +296,6 @@
                     shape: 'dot',
                     size: 10
                 },
-                // New groups
                 service: {
                     color: { background: '#1abc9c', border: '#16a085' },
                     shape: 'dot',
@@ -304,21 +333,33 @@
             network.setOptions({ physics: false });
         });
 
-        // Handle node click
+        // Handle node click (dynamic content – not translated via data-i18n, but the static labels will be translated by i18n.js)
         network.on('click', function(params) {
             if (params.nodes.length > 0) {
                 var nodeId = params.nodes[0];
                 var node = nodes.get(nodeId);
 
+                // The title "Node Information" is already static with data-i18n, but we can keep the dynamic part as is.
+                // For consistency, we can translate the status text dynamically using our translation object if needed,
+                // but since status values are from backend (approved/shadow), we keep them as is.
                 document.getElementById('infoTitle').innerHTML = node.label || 'Node Information';
 
                 var content = '<table class="table table-sm text-light">';
-                content += '<tr><td><strong>Type:</strong></td><td>' + (node.group || 'Unknown') + '</td></tr>';
-
-                if (node.status) {
-                    content += '<tr><td><strong>Status:</strong></td><td><span class="badge bg-' + (node.status == 'approved' ? 'success' : 'warning') + '">' + node.status + '</span></td></tr>';
+                // "Type:" – this static label should be translated. We'll use a simple inline approach because it's dynamic.
+                // To keep it clean, we'll fetch the translation from the global translations object if available.
+                var typeLabel = 'Type';
+                var statusLabel = 'Status';
+                var riskLabel = 'Risk Score';
+                if (window.translations && window.currentLang) {
+                    var t = window.translations[window.currentLang] || window.translations.en;
+                    typeLabel = t.typeCol || 'Type';
+                    statusLabel = t.statusLabel || 'Status';
+                    riskLabel = t.riskScoreLabel || 'Risk Score';
                 }
-
+                content += '<tr><td><strong>' + typeLabel + ':</strong></td><td>' + (node.group || 'Unknown') + '</td></tr>';
+                if (node.status) {
+                    content += '<tr><td><strong>' + statusLabel + ':</strong></td><td><span class="badge bg-' + (node.status == 'approved' ? 'success' : 'warning') + '">' + node.status + '</span></td></tr>';
+                }
                 if (node.title) {
                     var titleParts = node.title.split('\n');
                     titleParts.forEach(part => {
@@ -328,19 +369,15 @@
                         }
                     });
                 }
-
                 if (node.value) {
                     var riskClass = 'secondary';
                     if (node.value >= 20) riskClass = 'danger';
                     else if (node.value >= 10) riskClass = 'warning';
                     else if (node.value >= 5) riskClass = 'info';
                     else if (node.value > 0) riskClass = 'success';
-
-                    content += '<tr><td><strong>Risk Score:</strong></td><td><span class="badge bg-' + riskClass + '">' + node.value + '</span></td></tr>';
+                    content += '<tr><td><strong>' + riskLabel + ':</strong></td><td><span class="badge bg-' + riskClass + '">' + node.value + '</span></td></tr>';
                 }
-
                 content += '</table>';
-
                 document.getElementById('infoContent').innerHTML = content;
                 document.getElementById('infoPanel').classList.add('show');
             }
@@ -367,22 +404,28 @@
         window.addEventListener('resize', function() {
             network.fit();
         });
-    </script>
-      <script src="/static/js/i18n.js"></script>
-    <script>
-        // Initialize language switcher
+
+        // --- Language switcher logic ---
+        // Store current language globally for dynamic translations in the info panel
+        window.currentLang = localStorage.getItem('asi_lang') || 'en';
+        // Ensure translations object is accessible (from i18n.js)
+        if (typeof translations !== 'undefined') {
+            window.translations = translations;
+        }
+
         const langSelect = document.getElementById('languageSwitcher');
         if (langSelect) {
-            const savedLang = localStorage.getItem('asi_lang') || 'en';
-            langSelect.value = savedLang;
+            langSelect.value = window.currentLang;
             if (typeof applyLanguage === 'function') applyLanguage();
 
             langSelect.addEventListener('change', (e) => {
-                localStorage.setItem('asi_lang', e.target.value);
+                const newLang = e.target.value;
+                localStorage.setItem('asi_lang', newLang);
+                window.currentLang = newLang;
                 if (typeof applyLanguage === 'function') applyLanguage();
+                // Optionally, we could refresh the graph labels, but not needed for static elements.
             });
         }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
