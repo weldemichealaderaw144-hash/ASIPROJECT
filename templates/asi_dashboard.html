@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASI - Attack Surface Intelligence</title>
+    <title data-i18n="pageTitleIntel">ASI - Attack Surface Intelligence</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        /* Your existing styles - unchanged */
         :root {
             --primary: #f68b1f;
             --primary-hover: #ffa23f;
@@ -66,6 +67,23 @@
         .dropdown-item:hover {
             background-color: var(--primary);
             color: #000;
+        }
+
+        /* Language selector style */
+        .lang-selector {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 0.5rem;
+        }
+        .lang-selector option {
+            background: var(--bg-dark);
+            color: var(--primary);
         }
 
         .dashboard-header {
@@ -371,34 +389,34 @@
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('dashboard') }}">
-                            <i class="bi bi-speedometer2"></i> Main Dashboard
+                            <i class="bi bi-speedometer2"></i> <span data-i18n="mainDashboard">Main Dashboard</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('asset_map') }}">
-                            <i class="bi bi-diagram-3"></i> Asset Map
+                            <i class="bi bi-diagram-3"></i> <span data-i18n="assetMap">Asset Map</span>
                         </a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-folder"></i> Inventory
+                            <i class="bi bi-folder"></i> <span data-i18n="inventory">Inventory</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark">
-                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='domain') }}"><i class="bi bi-globe"></i> Domains</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='subdomain') }}"><i class="bi bi-diagram-2"></i> Subdomains</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='url') }}"><i class="bi bi-link"></i> URLs</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='ip') }}"><i class="bi bi-hdd-network"></i> IPs</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='port') }}"><i class="bi bi-plug"></i> Ports</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='service') }}"><i class="bi bi-hdd"></i> Services</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='technology') }}"><i class="bi bi-cpu"></i> Technologies</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='email') }}"><i class="bi bi-envelope"></i> Emails</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='cloud_asset') }}"><i class="bi bi-cloud"></i> Cloud Assets</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='api_endpoint') }}"><i class="bi bi-code-slash"></i> API Endpoints</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='domain') }}"><i class="bi bi-globe"></i> <span data-i18n="domains">Domains</span></a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='subdomain') }}"><i class="bi bi-diagram-2"></i> <span data-i18n="subdomains">Subdomains</span></a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='url') }}"><i class="bi bi-link"></i> <span data-i18n="urls">URLs</span></a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='ip') }}"><i class="bi bi-hdd-network"></i> <span data-i18n="ips">IPs</span></a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='port') }}"><i class="bi bi-plug"></i> <span data-i18n="ports">Ports</span></a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='service') }}"><i class="bi bi-hdd"></i> <span data-i18n="services">Services</span></a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='technology') }}"><i class="bi bi-cpu"></i> <span data-i18n="technologies">Technologies</span></a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='email') }}"><i class="bi bi-envelope"></i> <span data-i18n="emails">Emails</span></a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='cloud_asset') }}"><i class="bi bi-cloud"></i> <span data-i18n="cloudAssets">Cloud Assets</span></a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('inventory_by_type', asset_type='api_endpoint') }}"><i class="bi bi-code-slash"></i> <span data-i18n="apiEndpoints">API Endpoints</span></a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('view_shadows') }}">
-                            <i class="bi bi-exclamation-triangle"></i> Shadows
+                            <i class="bi bi-exclamation-triangle"></i> <span data-i18n="shadows">Shadows</span>
                             {% if shadow_count > 0 %}
                             <span class="badge bg-warning text-dark ms-1">{{ shadow_count }}</span>
                             {% endif %}
@@ -412,8 +430,14 @@
                         </span>
                     </li>
                     <li class="nav-item">
+                        <select id="languageSwitcher" class="lang-selector">
+                            <option value="en">English</option>
+                            <option value="am">አማርኛ</option>
+                        </select>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('logout') }}">
-                            <i class="bi bi-box-arrow-right"></i> Logout
+                            <i class="bi bi-box-arrow-right"></i> <span data-i18n="logout">Logout</span>
                         </a>
                     </li>
                 </ul>
@@ -426,16 +450,16 @@
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h2><i class="bi bi-shield-shaded"></i> Attack Surface Intelligence
-                        <small>Assets · Risk Analysis · Discovery</small>
+                    <h2><i class="bi bi-shield-shaded"></i> <span data-i18n="pageTitleIntel">Attack Surface Intelligence</span>
+                        <small data-i18n="pageSubtitleIntel">Assets · Risk Analysis · Discovery</small>
                     </h2>
                 </div>
                 <div class="col-md-4 text-end">
                     <button class="btn btn-outline-shodan me-2" onclick="refreshStats()">
-                        <i class="bi bi-arrow-repeat" id="refresh-icon"></i> Refresh
+                        <i class="bi bi-arrow-repeat" id="refresh-icon"></i> <span data-i18n="refresh">Refresh</span>
                     </button>
                     <a href="{{ url_for('export_asi') }}" class="btn btn-shodan-primary">
-                        <i class="bi bi-download"></i> Export
+                        <i class="bi bi-download"></i> <span data-i18n="export">Export</span>
                     </a>
                 </div>
             </div>
@@ -448,19 +472,19 @@
         <div class="filter-bar">
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control" placeholder="Filter assets by name, type, or value..." id="assetFilter">
+                <input type="text" class="form-control" id="assetFilter" data-i18n-placeholder="filterAssets" placeholder="Filter assets by name, type, or value...">
             </div>
             <select class="form-select w-auto" id="riskFilter" style="background-color: var(--bg-dark); border-color: var(--border-color);">
-                <option value="all">All Risk Levels</option>
-                <option value="extreme">Extreme (80+)</option>
-                <option value="severe">Severe (50-79)</option>
-                <option value="critical">Critical (20-49)</option>
-                <option value="high">High (10-19)</option>
-                <option value="medium">Medium (5-9)</option>
-                <option value="low">Low (1-4)</option>
-                <option value="none">None (0)</option>
+                <option value="all" data-i18n="allRiskLevels">All Risk Levels</option>
+                <option value="extreme" data-i18n="extreme">Extreme (80+)</option>
+                <option value="severe" data-i18n="severe">Severe (50-79)</option>
+                <option value="critical" data-i18n="critical">Critical (20-49)</option>
+                <option value="high" data-i18n="high">High (10-19)</option>
+                <option value="medium" data-i18n="medium">Medium (5-9)</option>
+                <option value="low" data-i18n="low">Low (1-4)</option>
+                <option value="none" data-i18n="none">None (0)</option>
             </select>
-            <button class="btn btn-shodan-primary" type="button" id="filterBtn"><i class="bi bi-funnel"></i> Apply</button>
+            <button class="btn btn-shodan-primary" type="button" id="filterBtn"><i class="bi bi-funnel"></i> <span data-i18n="applyFilter">Apply</span></button>
         </div>
 
         <!-- Stats Cards Row 1 -->
@@ -469,23 +493,23 @@
                 <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-building"></i></div>
                     <div class="stat-value">{{ total_assets }}</div>
-                    <div class="stat-label">Total Assets</div>
-                    <div class="stat-small">{{ domains_count }} domains</div>
+                    <div class="stat-label" data-i18n="totalAssets">Total Assets</div>
+                    <div class="stat-small">{{ domains_count }} <span data-i18n="domains">domains</span></div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-diagram-3"></i></div>
                     <div class="stat-value">{{ domains_count + subdomains_count }}</div>
-                    <div class="stat-label">Domains + Subdomains</div>
-                    <div class="stat-small">{{ subdomains_count }} subdomains</div>
+                    <div class="stat-label" data-i18n="domainsSubdomains">Domains + Subdomains</div>
+                    <div class="stat-small">{{ subdomains_count }} <span data-i18n="subdomains">subdomains</span></div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-hdd-stack"></i></div>
                     <div class="stat-value">{{ urls_count + api_count }}</div>
-                    <div class="stat-label">URLs + APIs</div>
+                    <div class="stat-label" data-i18n="urlsApis">URLs + APIs</div>
                     <div class="stat-small">{{ urls_count }} URLs, {{ api_count }} APIs</div>
                 </div>
             </div>
@@ -493,8 +517,8 @@
                 <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-exclamation-triangle-fill" style="color: var(--warning);"></i></div>
                     <div class="stat-value">{{ shadow_count }}</div>
-                    <div class="stat-label">Shadow Assets</div>
-                    <div class="stat-small">{{ recent_discoveries }} new (7d)</div>
+                    <div class="stat-label" data-i18n="shadowAssets">Shadow Assets</div>
+                    <div class="stat-small">{{ recent_discoveries }} <span data-i18n="newIn7d">new (7d)</span></div>
                 </div>
             </div>
         </div>
@@ -505,10 +529,10 @@
                 <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-graph-up"></i></div>
                     <div class="stat-value">{{ "%.1f"|format(avg_risk_score) }}</div>
-                    <div class="stat-label">Average Risk Score</div>
+                    <div class="stat-label" data-i18n="averageRisk">Average Risk Score</div>
                     <div class="stat-small">
                         {% set high_risk_count = assets|selectattr('risk_score', '>=', 50)|list|length %}
-                        {{ high_risk_count }} assets at high risk
+                        {{ high_risk_count }} <span data-i18n="assetsAtHighRisk">assets at high risk</span>
                     </div>
                 </div>
             </div>
@@ -516,7 +540,7 @@
                 <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-bug"></i></div>
                     <div class="stat-value">{{ total_vulnerabilities }}</div>
-                    <div class="stat-label">Total Vulnerabilities</div>
+                    <div class="stat-label" data-i18n="totalVulns">Total Vulnerabilities</div>
                     <div class="stat-small">{{ critical_vulns }} critical, {{ high_vulns }} high</div>
                 </div>
             </div>
@@ -524,7 +548,7 @@
                 <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-arrow-up-short"></i></div>
                     <div class="stat-value">{{ max_risk_score }}</div>
-                    <div class="stat-label">Highest Risk Score</div>
+                    <div class="stat-label" data-i18n="highestRisk">Highest Risk Score</div>
                     <div class="stat-small">
                         {% if max_risk_asset %}
                             <a href="{{ url_for('asset_dashboard', asset_id=max_risk_asset.id) }}" class="text-info text-decoration-none">
@@ -538,7 +562,7 @@
                 <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-shield-check"></i></div>
                     <div class="stat-value">{{ low_risk_count }}</div>
-                    <div class="stat-label">Low Risk Assets</div>
+                    <div class="stat-label" data-i18n="lowRiskAssets">Low Risk Assets</div>
                     <div class="stat-small">Score 1-9</div>
                 </div>
             </div>
@@ -550,80 +574,78 @@
                 <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-hdd"></i></div>
                     <div class="stat-value">{{ services_count }}</div>
-                    <div class="stat-label">Services</div>
+                    <div class="stat-label" data-i18n="services">Services</div>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-cpu"></i></div>
                     <div class="stat-value">{{ tech_count }}</div>
-                    <div class="stat-label">Technologies</div>
+                    <div class="stat-label" data-i18n="technologies">Technologies</div>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-envelope"></i></div>
                     <div class="stat-value">{{ email_count }}</div>
-                    <div class="stat-label">Emails</div>
+                    <div class="stat-label" data-i18n="emails">Emails</div>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-cloud"></i></div>
                     <div class="stat-value">{{ cloud_count }}</div>
-                    <div class="stat-label">Cloud Assets</div>
+                    <div class="stat-label" data-i18n="cloudAssets">Cloud Assets</div>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-code-slash"></i></div>
                     <div class="stat-value">{{ api_count }}</div>
-                    <div class="stat-label">API Endpoints</div>
+                    <div class="stat-label" data-i18n="apiEndpoints">API Endpoints</div>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-plug"></i></div>
                     <div class="stat-value">{{ ports_count }}</div>
-                    <div class="stat-label">Open Ports</div>
+                    <div class="stat-label" data-i18n="openPorts">Open Ports</div>
                 </div>
             </div>
         </div>
 
-      
-            <div class="col-md-6">
-                <div class="chart-container">
-                    <h5><i class="bi bi-check-circle"></i> Status Distribution</h5>
-                    <div id="statusChart"></div>
-                </div>
-            </div>
-        </div>
-
+        <!-- Charts Row -->
         <div class="row">
             <div class="col-md-6">
                 <div class="chart-container">
-                    <h5><i class="bi bi-exclamation-triangle"></i> Risk Score Distribution</h5>
+                    <h5><i class="bi bi-check-circle"></i> <span data-i18n="statusDistribution">Status Distribution</span></h5>
+                    <div id="statusChart"></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5><i class="bi bi-exclamation-triangle"></i> <span data-i18n="riskDistribution">Risk Score Distribution</span></h5>
                     <div id="riskChart"></div>
                 </div>
             </div>
-    
+        </div>
 
         <!-- Top Risk Assets Section -->
         <div class="row mt-4">
             <div class="col-md-12">
                 <div class="chart-container">
-                    <h5 class="mb-3"><i class="bi bi-exclamation-triangle-fill text-danger"></i> Top Risk Assets</h5>
+                    <h5 class="mb-3"><i class="bi bi-exclamation-triangle-fill text-danger"></i> <span data-i18n="topRiskAssets">Top Risk Assets</span></h5>
                     <div class="table-responsive">
                         <table class="table" id="topRiskTable">
                             <thead>
                                 <tr>
-                                    <th>Domain</th>
-                                    <th>Risk Score</th>
-                                    <th>Risk Level</th>
-                                    <th>Vulnerabilities</th>
-                                    <th>Assets Found</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
+                                    <th data-i18n="thDomain">Domain</th>
+                                    <th data-i18n="riskScore">Risk Score</th>
+                                    <th data-i18n="riskLevel">Risk Level</th>
+                                    <th data-i18n="vulnerabilities">Vulnerabilities</th>
+                                    <th data-i18n="assetsFound">Assets Found</th>
+                                    <th data-i18n="status">Status</th>
+                                    <th data-i18n="actions">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -709,9 +731,9 @@
                                     </td>
                                     <td>
                                         {% if asset.monitoring_enabled %}
-                                            <span class="badge bg-success"><i class="bi bi-play"></i> Active</span>
+                                            <span class="badge bg-success"><i class="bi bi-play"></i> <span data-i18n="active">Active</span></span>
                                         {% else %}
-                                            <span class="badge bg-secondary"><i class="bi bi-pause"></i> Paused</span>
+                                            <span class="badge bg-secondary"><i class="bi bi-pause"></i> <span data-i18n="paused">Paused</span></span>
                                         {% endif %}
                                     </td>
                                     <td>
@@ -740,7 +762,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="chart-container">
-                    <h5 class="mb-3"><i class="bi bi-grid-3x3-gap-fill"></i> Asset Breakdown by Type</h5>
+                    <h5 class="mb-3"><i class="bi bi-grid-3x3-gap-fill"></i> <span data-i18n="assetBreakdown">Asset Breakdown by Type</span></h5>
                     <div class="row g-3">
                         <div class="col-4 text-center">
                             <span class="asset-pill asset-domain"><i class="bi bi-globe"></i> Domain</span>
@@ -792,10 +814,10 @@
 
             <div class="col-md-6">
                 <div class="chart-container">
-                    <h5 class="mb-3"><i class="bi bi-tools"></i> Discovery Tools & Risk Factors</h5>
+                    <h5 class="mb-3"><i class="bi bi-tools"></i> <span data-i18n="discoveryTools">Discovery Tools & Risk Factors</span></h5>
                     <div class="row">
                         <div class="col-6">
-                            <h6 class="text-info"><i class="bi bi-search"></i> Discovery Tools</h6>
+                            <h6 class="text-info"><i class="bi bi-search"></i> <span data-i18n="discoveryToolsList">Discovery Tools</span></h6>
                             <ul class="list-unstyled small">
                                 <li><i class="bi bi-check-circle-fill text-success"></i> Subfinder</li>
                                 <li><i class="bi bi-check-circle-fill text-success"></i> Amass</li>
@@ -809,14 +831,14 @@
                             </ul>
                         </div>
                         <div class="col-6">
-                            <h6 class="text-warning"><i class="bi bi-exclamation-triangle"></i> Risk Factors</h6>
+                            <h6 class="text-warning"><i class="bi bi-exclamation-triangle"></i> <span data-i18n="riskFactorsList">Risk Factors</span></h6>
                             <ul class="list-unstyled small">
                                 <li><i class="bi bi-bug"></i> Vulnerability Severity (10/7/4/1 pts)</li>
                                 <li><i class="bi bi-hdd"></i> Services (0.2 pts each, cap 10)</li>
                                 <li><i class="bi bi-cpu"></i> Technologies (0.1 pts each, cap 5)</li>
                                 <li><i class="bi bi-plug"></i> Open Ports (0.1 pts each, cap 5)</li>
-                                <li class="mt-2 text-muted">Maximum Score: 100</li>
-                                <li class="text-info">Scores update after each scan</li>
+                                <li class="mt-2 text-muted" data-i18n="maxScore">Maximum Score: 100</li>
+                                <li class="text-info" data-i18n="scoresUpdate">Scores update after each scan</li>
                             </ul>
                         </div>
                     </div>
@@ -838,18 +860,18 @@
         <div class="row mt-4">
             <div class="col-12">
                 <div class="chart-container">
-                    <h5 class="mb-3"><i class="bi bi-activity"></i> Recent Discoveries</h5>
+                    <h5 class="mb-3"><i class="bi bi-activity"></i> <span data-i18n="recentDiscoveries">Recent Discoveries</span></h5>
                     <div class="table-responsive">
                         <table class="table" id="recentTable">
                             <thead>
                                 <tr>
-                                    <th>Type</th>
-                                    <th>Value</th>
-                                    <th>Asset</th>
-                                    <th>Risk Score</th>
-                                    <th>Status</th>
-                                    <th>Discovered By</th>
-                                    <th>Date</th>
+                                    <th data-i18n="type">Type</th>
+                                    <th data-i18n="value">Value</th>
+                                    <th data-i18n="asset">Asset</th>
+                                    <th data-i18n="riskScore">Risk Score</th>
+                                    <th data-i18n="status">Status</th>
+                                    <th data-i18n="discoveredBy">Discovered By</th>
+                                    <th data-i18n="date">Date</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -919,14 +941,11 @@
         </a>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/i18n.js"></script>
     <script>
         // Render charts
-        {% if charts.type_distribution %}
-        var typeChart = {{ charts.type_distribution | safe }};
-        Plotly.newPlot('typeChart', typeChart.data, typeChart.layout);
-        {% endif %}
-
         {% if charts.status_distribution %}
         var statusChart = {{ charts.status_distribution | safe }};
         Plotly.newPlot('statusChart', statusChart.data, statusChart.layout);
@@ -935,11 +954,6 @@
         {% if charts.risk_distribution %}
         var riskChart = {{ charts.risk_distribution | safe }};
         Plotly.newPlot('riskChart', riskChart.data, riskChart.layout);
-        {% endif %}
-
-        {% if charts.timeline %}
-        var timelineChart = {{ charts.timeline | safe }};
-        Plotly.newPlot('timelineChart', timelineChart.data, timelineChart.layout);
         {% endif %}
 
         function refreshStats() {
@@ -963,11 +977,10 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // Handle window resize for charts
         window.addEventListener('resize', function() {
-            if (typeof typeChart !== 'undefined') Plotly.relayout('typeChart', { width: document.getElementById('typeChart').offsetWidth });
             if (typeof statusChart !== 'undefined') Plotly.relayout('statusChart', { width: document.getElementById('statusChart').offsetWidth });
             if (typeof riskChart !== 'undefined') Plotly.relayout('riskChart', { width: document.getElementById('riskChart').offsetWidth });
-            if (typeof timelineChart !== 'undefined') Plotly.relayout('timelineChart', { width: document.getElementById('timelineChart').offsetWidth });
         });
 
         // Combined filter for inventory table and top risk assets
@@ -1045,7 +1058,6 @@
 
         // Auto-refresh every 30 seconds if any scans running
         setInterval(() => {
-            // Check if any scans might be running (optional)
             fetch('/asi/stats')
                 .then(response => response.json())
                 .then(data => {
@@ -1053,11 +1065,8 @@
                 })
                 .catch(err => console.log('Auto-refresh skipped'));
         }, 30000);
-    </script>
-      <script src="/static/js/i18n.js"></script>
-       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Initialize language switcher
+
+        // Language switcher initialization
         const langSelect = document.getElementById('languageSwitcher');
         if (langSelect) {
             const savedLang = localStorage.getItem('asi_lang') || 'en';
@@ -1070,6 +1079,5 @@
             });
         }
     </script>
- 
 </body>
 </html>
