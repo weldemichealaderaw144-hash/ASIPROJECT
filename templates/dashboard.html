@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ASI Admin Dashboard</title>
+    <title id="pageTitle">ASI Admin Dashboard</title>
     <!-- Bootstrap 5 (dark theme) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -33,6 +33,8 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
         .page-header h2 {
             font-weight: 400;
@@ -255,6 +257,21 @@
             border: 1px solid #2c3a47;
             color: #b6c2cd;
         }
+        /* Language selector */
+        .lang-selector {
+            background: transparent;
+            border: 1px solid #f68b1f;
+            color: #f68b1f;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .lang-selector option {
+            background: #0a0e12;
+            color: #f68b1f;
+        }
     </style>
 </head>
 <body data-bs-theme="dark">
@@ -262,7 +279,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: #0f1419;">
     <div class="container-fluid">
         <a class="navbar-brand" href="{{ url_for('dashboard') }}">
-            <i class="bi bi-shield-shaded"></i> Attack Surface Intel <span style="color:#f68b1f;">Admin</span>
+            <i class="bi bi-shield-shaded"></i> <span data-i18n="brand">Attack Surface Intel</span> <span style="color:#f68b1f;" data-i18n="adminLabel">Admin</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -270,19 +287,25 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 {% if session.get('role') == 'admin' %}
-                    <li class="nav-item"><a href="{{ url_for('add_asset') }}" class="btn btn-sm btn-outline-shodan me-2"><i class="bi bi-plus-circle"></i> Add Asset</a></li>
-                    <li class="nav-item"><a href="{{ url_for('admin_users') }}" class="btn btn-sm btn-outline-shodan me-2"><i class="bi bi-people"></i> Users</a></li>
-                    <li class="nav-item"><a href="{{ url_for('activity_logs') }}" class="btn btn-sm btn-outline-shodan me-2"><i class="bi bi-journal-text"></i> Logs</a></li>
-                    <li class="nav-item"><a href="{{ url_for('attack_surface_intelligence') }}" class="btn btn-sm btn-outline-shodan me-2"><i class="bi bi-graph-up"></i> ASI Intel</a></li>
+                    <li class="nav-item"><a href="{{ url_for('add_asset') }}" class="btn btn-sm btn-outline-shodan me-2"><i class="bi bi-plus-circle"></i> <span data-i18n="addAsset">Add Asset</span></a></li>
+                    <li class="nav-item"><a href="{{ url_for('admin_users') }}" class="btn btn-sm btn-outline-shodan me-2"><i class="bi bi-people"></i> <span data-i18n="users">Users</span></a></li>
+                    <li class="nav-item"><a href="{{ url_for('activity_logs') }}" class="btn btn-sm btn-outline-shodan me-2"><i class="bi bi-journal-text"></i> <span data-i18n="logs">Logs</span></a></li>
+                    <li class="nav-item"><a href="{{ url_for('attack_surface_intelligence') }}" class="btn btn-sm btn-outline-shodan me-2"><i class="bi bi-graph-up"></i> <span data-i18n="asiIntel">ASI Intel</span></a></li>
                 {% endif %}
             </ul>
             <ul class="navbar-nav ms-auto">
+                <li class="nav-item me-2">
+                    <select id="languageSelect" class="lang-selector">
+                        <option value="en">English</option>
+                        <option value="am">አማርኛ</option>
+                    </select>
+                </li>
                 <li class="nav-item">
                     <span class="navbar-text text-light me-3">
                         <i class="bi bi-person-circle"></i> {{ session.get('username') }} ({{ session.get('role') }})
                     </span>
                 </li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> <span data-i18n="logout">Logout</span></a></li>
             </ul>
         </div>
     </div>
@@ -290,28 +313,28 @@
 
 <div class="container mt-4">
     <div class="page-header">
-        <h2>የጥቃት ቦታ መዝገብ  <small>– ሀብቶች · አደጋ · እንቅስቃሴ መከታተያ</small></h2>
+        <h2><span data-i18n="pageTitle">Attack Surface Inventory</span> <small data-i18n="pageSubtitle">– Assets · Risk · Monitoring Activity</small></h2>
         <div class="filter-bar">
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control" placeholder="Filter by domain, IP, or tag..." id="assetFilter">
+                <input type="text" class="form-control" id="assetFilter" placeholder="Filter by domain, IP, or tag..." data-i18n-placeholder="filterPlaceholder">
             </div>
-            <button class="btn btn-shodan-primary" type="button" id="filterBtn"><i class="bi bi-funnel"></i> Apply</button>
+            <button class="btn btn-shodan-primary" type="button" id="filterBtn"><i class="bi bi-funnel"></i> <span data-i18n="applyFilter">Apply</span></button>
         </div>
     </div>
 
     <div class="table-responsive">
         <table class="table" id="assetTable">
             <thead>
-
-                    <th>ID</th>
-                    <th>Domain</th>
-                    <th>Created</th>
-                    <th>Approved / Shadow</th>
-                    <th>Risk & Severity</th>
-                    <th>Scan Progress</th>
-                    <th>Monitoring</th>
-                    <th>Actions</th>
+                <tr>
+                    <th data-i18n="thId">ID</th>
+                    <th data-i18n="thDomain">Domain</th>
+                    <th data-i18n="thCreated">Created</th>
+                    <th data-i18n="thApprovedShadow">Approved / Shadow</th>
+                    <th data-i18n="thRiskSeverity">Risk & Severity</th>
+                    <th data-i18n="thScanProgress">Scan Progress</th>
+                    <th data-i18n="thMonitoring">Monitoring</th>
+                    <th data-i18n="thActions">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -329,8 +352,8 @@
                     </td>
                     <td class="mono-data">{{ asset.created_at.strftime('%Y-%m-%d<br>%H:%M') | safe }}</td>
                     <td>
-                        <span class="monitoring-badge-custom"><i class="bi bi-check-circle" style="color:#3fb68b;"></i> {{ approved_count }} Approved</span>
-                        <span class="monitoring-badge-custom"><i class="bi bi-exclamation-triangle" style="color:#f6c445;"></i> {{ shadow_count }} Shadow</span>
+                        <span class="monitoring-badge-custom"><i class="bi bi-check-circle" style="color:#3fb68b;"></i> <span data-i18n="approvedCount">{{ approved_count }} Approved</span></span>
+                        <span class="monitoring-badge-custom"><i class="bi bi-exclamation-triangle" style="color:#f6c445;"></i> <span data-i18n="shadowCount">{{ shadow_count }} Shadow</span></span>
                     </td>
                     <td id="risk-score-{{ asset.id }}">
                         {% set score = asset.risk_score %}
@@ -355,7 +378,6 @@
                             {% endif %}
                         </div>
                         <div class="tool-grid">
-                            <!-- ✅ Only the 9 required tools + DNSX (part of tools) and additional tech detection -->
                             <div class="tool-item"><i class="bi bi-search"></i> subfinder <span id="subfinder-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.subfinder_status == 'done' else 'warning' if last_scan and last_scan.subfinder_status == 'running' else 'danger' if last_scan and last_scan.subfinder_status == 'failed' else 'secondary' }}">{{ last_scan.subfinder_status if last_scan else 'pending' }}</span></div>
                             <div class="tool-item"><i class="bi bi-diagram-3"></i> amass <span id="amass-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.amass_status == 'done' else 'warning' if last_scan and last_scan.amass_status == 'running' else 'danger' if last_scan and last_scan.amass_status == 'failed' else 'secondary' }}">{{ last_scan.amass_status if last_scan else 'pending' }}</span></div>
                             <div class="tool-item"><i class="bi bi-files"></i> assetfinder <span id="assetfinder-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.assetfinder_status == 'done' else 'warning' if last_scan and last_scan.assetfinder_status == 'running' else 'danger' if last_scan and last_scan.assetfinder_status == 'failed' else 'secondary' }}">{{ last_scan.assetfinder_status if last_scan else 'pending' }}</span></div>
@@ -368,7 +390,7 @@
                             <div class="tool-item"><i class="bi bi-camera"></i> gowitness <span id="gowitness-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.gowitness_status == 'done' else 'warning' if last_scan and last_scan.gowitness_status == 'running' else 'danger' if last_scan and last_scan.gowitness_status == 'failed' else 'secondary' }}">{{ last_scan.gowitness_status if last_scan else 'pending' }}</span></div>
                             <div class="tool-item"><i class="bi bi-shield-exclamation"></i> subzy <span id="subzy-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.subzy_status == 'done' else 'warning' if last_scan and last_scan.subzy_status == 'running' else 'danger' if last_scan and last_scan.subzy_status == 'failed' else 'secondary' }}">{{ last_scan.subzy_status if last_scan else 'pending' }}</span></div>
                             <div class="tool-item"><i class="bi bi-cpu"></i> whatweb <span id="whatweb-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.whatweb_status == 'done' else 'warning' if last_scan and last_scan.whatweb_status == 'running' else 'danger' if last_scan and last_scan.whatweb_status == 'failed' else 'secondary' }}">{{ last_scan.whatweb_status if last_scan else 'pending' }}</span></div>
-<div class="tool-item"><i class="bi bi-envelope"></i> theharvester <span id="theharvester-status-{{ asset.id }}" class="tool-status text-...">{{ last_scan.theharvester_status if last_scan else 'pending' }}</span></div>
+                            <div class="tool-item"><i class="bi bi-envelope"></i> theharvester <span id="theharvester-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.theharvester_status == 'done' else 'warning' if last_scan and last_scan.theharvester_status == 'running' else 'danger' if last_scan and last_scan.theharvester_status == 'failed' else 'secondary' }}">{{ last_scan.theharvester_status if last_scan else 'pending' }}</span></div>
                             <div class="tool-item"><i class="bi bi-braces"></i> wappalyzer <span id="wappalyzer-status-{{ asset.id }}" class="tool-status text-{{ 'success' if last_scan and last_scan.wappalyzer_status == 'done' else 'warning' if last_scan and last_scan.wappalyzer_status == 'running' else 'danger' if last_scan and last_scan.wappalyzer_status == 'failed' else 'secondary' }}">{{ last_scan.wappalyzer_status if last_scan else 'pending' }}</span></div>
                         </div>
                     </td>
@@ -376,14 +398,14 @@
                         <div class="d-flex flex-column align-items-start gap-2">
                             <span class="monitoring-badge-custom">
                                 <i class="bi bi-{{ 'play' if asset.monitoring_enabled else 'pause' }}"></i>
-                                {{ 'Enabled' if asset.monitoring_enabled else 'Disabled' }}
+                                <span data-i18n="monitoringStatus">{{ 'Enabled' if asset.monitoring_enabled else 'Disabled' }}</span>
                             </span>
                             {% if session.get('role') == 'admin' %}
                                 <a href="{{ url_for('toggle_schedule', asset_id=asset.id) }}"
                                    class="btn btn-sm btn-outline-shodan"
                                    onclick="return confirm('{{ 'Disable' if asset.monitoring_enabled else 'Enable' }} scheduled scans for {{ asset.domain }}?')">
                                     <i class="bi bi-{{ 'pause' if asset.monitoring_enabled else 'play' }}"></i>
-                                    {{ 'Pause' if asset.monitoring_enabled else 'Resume' }}
+                                    <span data-i18n="toggleSchedule">{{ 'Pause' if asset.monitoring_enabled else 'Resume' }}</span>
                                 </a>
                             {% endif %}
                         </div>
@@ -393,15 +415,15 @@
                             <form method="POST" action="{{ url_for('update_schedule', asset_id=asset.id) }}" class="mb-2">
                                 <div class="input-group input-group-sm">
                                     <select name="frequency" class="form-select wide-select">
-                                        <option value="manual" {% if not asset.monitoring_enabled %}selected{% endif %}>Immediate scan</option>
-                                        <option value="hourly" {% if asset.monitoring_frequency=='hourly' and asset.monitoring_enabled %}selected{% endif %}>Hourly</option>
-                                        <option value="daily" {% if asset.monitoring_frequency=='daily' and asset.monitoring_enabled %}selected{% endif %}>Daily</option>
-                                        <option value="weekly" {% if asset.monitoring_frequency=='weekly' and asset.monitoring_enabled %}selected{% endif %}>Weekly</option>
-                                        <option value="monthly" {% if asset.monitoring_frequency=='monthly' and asset.monitoring_enabled %}selected{% endif %}>Monthly</option>
+                                        <option value="manual" {% if not asset.monitoring_enabled %}selected{% endif %} data-i18n-option-manual>Immediate scan</option>
+                                        <option value="hourly" {% if asset.monitoring_frequency=='hourly' and asset.monitoring_enabled %}selected{% endif %} data-i18n-option-hourly>Hourly</option>
+                                        <option value="daily" {% if asset.monitoring_frequency=='daily' and asset.monitoring_enabled %}selected{% endif %} data-i18n-option-daily>Daily</option>
+                                        <option value="weekly" {% if asset.monitoring_frequency=='weekly' and asset.monitoring_enabled %}selected{% endif %} data-i18n-option-weekly>Weekly</option>
+                                        <option value="monthly" {% if asset.monitoring_frequency=='monthly' and asset.monitoring_enabled %}selected{% endif %} data-i18n-option-monthly>Monthly</option>
                                     </select>
                                     <div class="input-group-text">
                                         <input type="checkbox" name="run_now" value="1" id="run_now_{{ asset.id }}">
-                                        <label for="run_now_{{ asset.id }}" class="ms-1 small">run now</label>
+                                        <label for="run_now_{{ asset.id }}" class="ms-1 small" data-i18n="runNow">run now</label>
                                     </div>
                                     <button class="btn btn-outline-shodan" type="submit">
                                         <i class="bi bi-save"></i>
@@ -416,17 +438,17 @@
                                     <i class="bi bi-gear"></i>
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{{ url_for('asset_dashboard', asset_id=asset.id) }}"><i class="bi bi-eye"></i> View Asset</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('view_report', asset_id=asset.id) }}"><i class="bi bi-file-text"></i> Report</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('asset_dashboard', asset_id=asset.id) }}"><i class="bi bi-eye"></i> <span data-i18n="viewAsset">View Asset</span></a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('view_report', asset_id=asset.id) }}"><i class="bi bi-file-text"></i> <span data-i18n="report">Report</span></a></li>
                                     {% if session.get('role') == 'admin' %}
                                         <li><hr class="dropdown-divider"></li>
                                         {% if last_scan and last_scan.status == 'running' %}
-                                            <li><a class="dropdown-item text-danger" href="{{ url_for('stop_scan', scan_id=last_scan.id) }}" onclick="return confirm('Stop current scan?');"><i class="bi bi-stop-circle"></i> Stop Scan</a></li>
+                                            <li><a class="dropdown-item text-danger" href="{{ url_for('stop_scan', scan_id=last_scan.id) }}" onclick="return confirm('Stop current scan?');"><i class="bi bi-stop-circle"></i> <span data-i18n="stopScan">Stop Scan</span></a></li>
                                         {% else %}
-                                            <li><a class="dropdown-item" href="{{ url_for('scan_asset', asset_id=asset.id) }}"><i class="bi bi-play-circle"></i> Start Scan</a></li>
+                                            <li><a class="dropdown-item" href="{{ url_for('scan_asset', asset_id=asset.id) }}"><i class="bi bi-play-circle"></i> <span data-i18n="startScan">Start Scan</span></a></li>
                                         {% endif %}
-                                        <li><a class="dropdown-item text-warning" href="{{ url_for('edit_asset', asset_id=asset.id) }}"><i class="bi bi-pencil"></i> Edit Asset</a></li>
-                                        <li><a class="dropdown-item text-danger" href="{{ url_for('delete_asset', asset_id=asset.id) }}" onclick="return confirm('Permanently delete this asset?');"><i class="bi bi-trash"></i> Delete</a></li>
+                                        <li><a class="dropdown-item text-warning" href="{{ url_for('edit_asset', asset_id=asset.id) }}"><i class="bi bi-pencil"></i> <span data-i18n="editAsset">Edit Asset</span></a></li>
+                                        <li><a class="dropdown-item text-danger" href="{{ url_for('delete_asset', asset_id=asset.id) }}" onclick="return confirm('Permanently delete this asset?');"><i class="bi bi-trash"></i> <span data-i18n="deleteAsset">Delete</span></a></li>
                                     {% endif %}
                                 </ul>
                             </div>
@@ -444,6 +466,153 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+// Translation strings
+const translations = {
+    en: {
+        brand: "Attack Surface Intel",
+        adminLabel: "Admin",
+        addAsset: "Add Asset",
+        users: "Users",
+        logs: "Logs",
+        asiIntel: "ASI Intel",
+        logout: "Logout",
+        pageTitle: "Attack Surface Inventory",
+        pageSubtitle: "– Assets · Risk · Monitoring Activity",
+        filterPlaceholder: "Filter by domain, IP, or tag...",
+        applyFilter: "Apply",
+        thId: "ID",
+        thDomain: "Domain",
+        thCreated: "Created",
+        thApprovedShadow: "Approved / Shadow",
+        thRiskSeverity: "Risk & Severity",
+        thScanProgress: "Scan Progress",
+        thMonitoring: "Monitoring",
+        thActions: "Actions",
+        approvedCount: "Approved",
+        shadowCount: "Shadow",
+        monitoringStatus: "Enabled",
+        monitoringStatusDisabled: "Disabled",
+        toggleSchedule: "Pause",
+        toggleScheduleResume: "Resume",
+        runNow: "run now",
+        viewAsset: "View Asset",
+        report: "Report",
+        stopScan: "Stop Scan",
+        startScan: "Start Scan",
+        editAsset: "Edit Asset",
+        deleteAsset: "Delete",
+        // schedule options
+        scheduleManual: "Immediate scan",
+        scheduleHourly: "Hourly",
+        scheduleDaily: "Daily",
+        scheduleWeekly: "Weekly",
+        scheduleMonthly: "Monthly"
+    },
+    am: {
+        brand: "የጥቃት ወለል መረጃ",
+        adminLabel: "አስተዳዳሪ",
+        addAsset: "ንብረት ጨምር",
+        users: "ተጠቃሚዎች",
+        logs: "መዝገቦች",
+        asiIntel: "ASI መረጃ",
+        logout: "ውጣ",
+        pageTitle: "የጥቃት ወለል ክምችት",
+        pageSubtitle: "– ንብረቶች · ስጋት · ክትትል እንቅስቃሴ",
+        filterPlaceholder: "በዶሜይን፣ አይፒ ወይም መለያ አጣራ...",
+        applyFilter: "ተግብር",
+        thId: "መታወቂያ",
+        thDomain: "ዶሜይን",
+        thCreated: "ተፈጠረ",
+        thApprovedShadow: "የፀደቀ / ጥላ",
+        thRiskSeverity: "ስጋት እና ክብደት",
+        thScanProgress: "የቃኘት ሂደት",
+        thMonitoring: "ክትትል",
+        thActions: "ድርጊቶች",
+        approvedCount: "የፀደቀ",
+        shadowCount: "ጥላ",
+        monitoringStatus: "ነቃ",
+        monitoringStatusDisabled: "ተቋርጧል",
+        toggleSchedule: "አቁም",
+        toggleScheduleResume: "ቀጥል",
+        runNow: "አሁን አሂድ",
+        viewAsset: "ንብረት ተመልከት",
+        report: "ሪፖርት",
+        stopScan: "ቃኘት አቁም",
+        startScan: "ቃኘት ጀምር",
+        editAsset: "ንብረት አርትዕ",
+        deleteAsset: "ሰርዝ",
+        scheduleManual: "ፈጣን ቃኘት",
+        scheduleHourly: "በየሰዓቱ",
+        scheduleDaily: "በየቀኑ",
+        scheduleWeekly: "በየሳምንቱ",
+        scheduleMonthly: "በየወሩ"
+    }
+};
+
+function setLanguage(lang) {
+    const t = translations[lang];
+    if (!t) return;
+    // Update page title
+    document.getElementById('pageTitle').innerText = (lang === 'en' ? 'ASI Admin Dashboard' : 'ASI አስተዳደር ዳሽቦርድ');
+    // Update all elements with data-i18n attribute
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key] !== undefined) {
+            if (el.tagName === 'INPUT' && el.hasAttribute('placeholder')) {
+                el.placeholder = t[key];
+            } else {
+                el.innerText = t[key];
+            }
+        }
+    });
+    // Update placeholder specifically
+    const filterInput = document.getElementById('assetFilter');
+    if (filterInput) filterInput.placeholder = t.filterPlaceholder;
+    // Update select options
+    const selects = document.querySelectorAll('select[name="frequency"]');
+    selects.forEach(select => {
+        const options = select.options;
+        for (let i = 0; i < options.length; i++) {
+            const opt = options[i];
+            const val = opt.value;
+            let key = '';
+            if (val === 'manual') key = 'scheduleManual';
+            else if (val === 'hourly') key = 'scheduleHourly';
+            else if (val === 'daily') key = 'scheduleDaily';
+            else if (val === 'weekly') key = 'scheduleWeekly';
+            else if (val === 'monthly') key = 'scheduleMonthly';
+            if (t[key]) opt.innerText = t[key];
+        }
+    });
+    // Update monitoring status texts (those that are dynamic)
+    document.querySelectorAll('.monitoring-badge-custom').forEach(badge => {
+        const iconSpan = badge.querySelector('i');
+        const textSpan = badge.querySelector('span[data-i18n]');
+        if (textSpan && textSpan.getAttribute('data-i18n') === 'monitoringStatus') {
+            const isEnabled = iconSpan.classList.contains('bi-play');
+            textSpan.innerText = isEnabled ? t.monitoringStatus : t.monitoringStatusDisabled;
+        }
+    });
+    // Update toggle schedule button text
+    document.querySelectorAll('a[href*="toggle_schedule"]').forEach(link => {
+        const span = link.querySelector('span[data-i18n]');
+        if (span) {
+            const isPause = link.querySelector('i.bi-pause') !== null;
+            span.innerText = isPause ? t.toggleSchedule : t.toggleScheduleResume;
+        }
+    });
+}
+
+// Event listener for language dropdown
+document.getElementById('languageSelect').addEventListener('change', function(e) {
+    setLanguage(e.target.value);
+    // Also refresh the scan status displays (they contain numbers, no translation needed)
+});
+
+// Set default language (English)
+setLanguage('en');
+
+// ========== Existing scan status polling code (unchanged) ==========
 function statusColorClass(status) {
     if (status === 'done' || status === 'completed') return 'success';
     if (status === 'running') return 'warning';
@@ -471,7 +640,6 @@ function updateScanStatus(assetId) {
                 statusEl.innerHTML = `<span class="status-dot ${data.status}"></span> <span class="badge bg-${badgeClass}">${data.status}</span>`;
             }
 
-            // ✅ Only the 9 tools (plus dnsx and tech detections) – adjust list as needed
             const tools = [
                 'subfinder', 'amass', 'assetfinder', 'dnsx', 'httpx',
                 'naabu', 'katana', 'gau', 'nuclei', 'gowitness',
