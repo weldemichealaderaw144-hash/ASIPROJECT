@@ -148,49 +148,44 @@ body{
     background: black;
     color: #00ff9f;
 }
-</style>
+ </style>
 </head>
-
 <body>
-
 <div class="terminal">
-
-<!-- Language dropdown -->
-
-
-<div id="terminalHeader" class="terminal-header typing">
-Initializing ASI Security Terminal...
+    <select id="languageSwitcher" class="lang-selector">
+        <option value="en">English</option>
+        <option value="am">አማርኛ</option>
+    </select>
+    <div class="terminal-header typing" data-i18n="terminalHeader"></div>
+    <form method="POST">
+        <div class="prompt" data-i18n="promptUsername"></div>
+        <input type="text" name="username" class="form-control mb-3" required>
+        <div class="prompt" data-i18n="promptPassword"></div>
+        <input type="password" name="password" class="form-control" required>
+        <button class="btn login-btn w-100" data-i18n="loginButton"></button>
+    </form>
+    <div class="footer" data-i18n="footerText"></div>
 </div>
 
-<form method="POST">
-
-<div id="promptUsername" class="prompt">
-> Enter Username
-</div>
-
-<input type="text" name="username" class="form-control mb-3" required>
-
-<div id="promptPassword" class="prompt">
-> Enter Password
-</div>
-
-<input type="password" name="password" class="form-control">
-
-<button id="loginButton" class="btn login-btn w-100">
-EXECUTE LOGIN
-</button>
-
-</form>
-
-<div id="footerText" class="footer">
-ASI • Asset Security Intelligence System
-</div>
-
-</div>
-
+<script src="/static/js/i18n.js"></script>
 <script>
-// Translation strings
+    const langSelect = document.getElementById('languageSwitcher');
+    // Set initial value from localStorage
+    const savedLang = localStorage.getItem('asi_lang') || 'en';
+    langSelect.value = savedLang;
+    // Apply language (i18n.js already does it on DOMContentLoaded)
+    // But we need to apply immediately because the script loads after DOM
+    if (typeof applyLanguage === 'function') applyLanguage();
 
-
+    langSelect.addEventListener('change', (e) => {
+        localStorage.setItem('asi_lang', e.target.value);
+        applyLanguage();
+        // Restart typing animation if needed (optional)
+        const header = document.querySelector('.terminal-header');
+        header.classList.remove('typing');
+        void header.offsetWidth;
+        header.classList.add('typing');
+    });
+</script>
 </body>
 </html>
