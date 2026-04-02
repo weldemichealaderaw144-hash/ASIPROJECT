@@ -2,32 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ASI Secure Terminal</title>
+<title data-i18n="pageTitle">ASI Secure Terminal</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
 <style>
-    <script src="/static/js/i18n.js"></script>
-<script>
-    const langSelect = document.getElementById('languageSwitcher');
-    // Set initial value from localStorage
-    const savedLang = localStorage.getItem('asi_lang') || 'en';
-    langSelect.value = savedLang;
-    // Apply language (i18n.js already does it on DOMContentLoaded)
-    // But we need to apply immediately because the script loads after DOM
-    if (typeof applyLanguage === 'function') applyLanguage();
-
-    langSelect.addEventListener('change', (e) => {
-        localStorage.setItem('asi_lang', e.target.value);
-        applyLanguage();
-        // Restart typing animation if needed (optional)
-        const header = document.querySelector('.terminal-header');
-        header.classList.remove('typing');
-        void header.offsetWidth;
-        header.classList.add('typing');
-    });
-</script>
 body{
     background:black;
     font-family: 'Share Tech Mono', monospace;
@@ -36,6 +16,7 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
+    margin:0;
 }
 
 /* Terminal Window */
@@ -148,44 +129,68 @@ body{
     background: black;
     color: #00ff9f;
 }
- </style>
+</style>
 </head>
 <body>
+
 <div class="terminal">
+    <!-- Language Dropdown -->
     <select id="languageSwitcher" class="lang-selector">
         <option value="en">English</option>
         <option value="am">አማርኛ</option>
     </select>
-    <div class="terminal-header typing" data-i18n="terminalHeader"></div>
-    <form method="POST">
-        <div class="prompt" data-i18n="promptUsername"></div>
-        <input type="text" name="username" class="form-control mb-3" required>
-        <div class="prompt" data-i18n="promptPassword"></div>
+
+    <div class="terminal-header typing" data-i18n="terminalHeader">Initializing ASI Security Terminal...</div>
+
+    <form method="POST" action="">
+        <div class="prompt" data-i18n="promptUsername">&gt; Enter Username</div>
+        <input type="text" name="username" class="form-control mb-3" required autocomplete="off">
+
+        <div class="prompt" data-i18n="promptPassword">&gt; Enter Password</div>
         <input type="password" name="password" class="form-control" required>
-        <button class="btn login-btn w-100" data-i18n="loginButton"></button>
+
+        <button class="btn login-btn w-100" data-i18n="loginButton">EXECUTE LOGIN</button>
     </form>
-    <div class="footer" data-i18n="footerText"></div>
+
+    <div class="footer" data-i18n="footerText">ASI • Asset Security Intelligence System</div>
 </div>
 
+<!-- Shared i18n script -->
 <script src="/static/js/i18n.js"></script>
 <script>
-    const langSelect = document.getElementById('languageSwitcher');
-    // Set initial value from localStorage
-    const savedLang = localStorage.getItem('asi_lang') || 'en';
-    langSelect.value = savedLang;
-    // Apply language (i18n.js already does it on DOMContentLoaded)
-    // But we need to apply immediately because the script loads after DOM
-    if (typeof applyLanguage === 'function') applyLanguage();
+    (function() {
+        const langSelect = document.getElementById('languageSwitcher');
+        if (!langSelect) return;
 
-    langSelect.addEventListener('change', (e) => {
-        localStorage.setItem('asi_lang', e.target.value);
-        applyLanguage();
-        // Restart typing animation if needed (optional)
-        const header = document.querySelector('.terminal-header');
-        header.classList.remove('typing');
-        void header.offsetWidth;
-        header.classList.add('typing');
-    });
+        // Load saved language or default to English
+        const savedLang = localStorage.getItem('asi_lang') || 'en';
+        langSelect.value = savedLang;
+
+        // Apply translations (from i18n.js)
+        if (typeof applyLanguage === 'function') {
+            applyLanguage();
+        }
+
+        // Restart typing animation after text changes
+        function restartTypingAnimation() {
+            const header = document.querySelector('.terminal-header');
+            if (!header) return;
+            header.classList.remove('typing');
+            // Force reflow to restart animation
+            void header.offsetWidth;
+            header.classList.add('typing');
+        }
+
+        // Handle language switch
+        langSelect.addEventListener('change', function(e) {
+            const newLang = e.target.value;
+            localStorage.setItem('asi_lang', newLang);
+            if (typeof applyLanguage === 'function') {
+                applyLanguage();
+                restartTypingAnimation();
+            }
+        });
+    })();
 </script>
 </body>
 </html>
