@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Add Asset · ASI Shodan Style</title>
+    <title id="pageTitle">Add Asset · ASI Shodan Style</title>
     <!-- Bootstrap 5 dark theme -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -184,15 +184,31 @@
         .btn i {
             margin-right: 5px;
         }
+
+        /* Language selector */
+        .lang-selector {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .lang-selector option {
+            background: var(--bg-dark);
+            color: var(--primary);
+        }
     </style>
 </head>
 <body data-bs-theme="dark">
 
-    <!-- Shodan-style navbar (identical to dashboard) -->
+    <!-- Shodan-style navbar with language dropdown -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: #0f1419;">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ url_for('dashboard') }}">
-                <i class="bi bi-shield-shaded"></i> ASI <span style="color:#f68b1f;">Admin</span>
+                <i class="bi bi-shield-shaded"></i> <span data-i18n="brand">ASI</span> <span style="color:#f68b1f;" data-i18n="adminLabel">Admin</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -200,19 +216,25 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     {% if session.get('role') == 'admin' %}
-                        <li class="nav-item"><a href="{{ url_for('add_asset') }}" class="btn btn-sm btn-outline-shodan me-2"><i class="bi bi-plus-circle"></i> Add Asset</a></li>
-                        <li class="nav-item"><a href="{{ url_for('admin_users') }}" class="btn btn-sm btn-outline-shodan me-2"><i class="bi bi-people"></i> Users</a></li>
-                        <li class="nav-item"><a href="{{ url_for('activity_logs') }}" class="btn btn-sm btn-outline-shodan me-2"><i class="bi bi-journal-text"></i> Logs</a></li>
-                        <li class="nav-item"><a href="{{ url_for('attack_surface_intelligence') }}" class="btn btn-sm btn-outline-shodan me-2"><i class="bi bi-graph-up"></i> ASI Intel</a></li>
+                        <li class="nav-item"><a href="{{ url_for('add_asset') }}" class="btn btn-sm btn-outline-shodan me-2"><i class="bi bi-plus-circle"></i> <span data-i18n="addAsset">Add Asset</span></a></li>
+                        <li class="nav-item"><a href="{{ url_for('admin_users') }}" class="btn btn-sm btn-outline-shodan me-2"><i class="bi bi-people"></i> <span data-i18n="users">Users</span></a></li>
+                        <li class="nav-item"><a href="{{ url_for('activity_logs') }}" class="btn btn-sm btn-outline-shodan me-2"><i class="bi bi-journal-text"></i> <span data-i18n="logs">Logs</span></a></li>
+                        <li class="nav-item"><a href="{{ url_for('attack_surface_intelligence') }}" class="btn btn-sm btn-outline-shodan me-2"><i class="bi bi-graph-up"></i> <span data-i18n="asiIntel">ASI Intel</span></a></li>
                     {% endif %}
                 </ul>
                 <ul class="navbar-nav ms-auto">
+                    <li class="nav-item me-2">
+                        <select id="languageSelect" class="lang-selector">
+                            <option value="en">English</option>
+                            <option value="am">አማርኛ</option>
+                        </select>
+                    </li>
                     <li class="nav-item">
                         <span class="navbar-text text-light me-3">
                             <i class="bi bi-person-circle"></i> {{ session.get('username') }} ({{ session.get('role') }})
                         </span>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> <span data-i18n="logout">Logout</span></a></li>
                 </ul>
             </div>
         </div>
@@ -222,7 +244,7 @@
     <div class="container">
         <!-- Page header (Shodan style) -->
         <div class="page-header">
-            <h2><i class="bi bi-plus-circle"></i> Add New Asset</h2>
+            <h2><i class="bi bi-plus-circle"></i> <span data-i18n="pageTitle">Add New Asset</span></h2>
         </div>
 
         <!-- Form card -->
@@ -232,65 +254,65 @@
                 <!-- Domain + Subdomain -->
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <label class="form-label"><i class="bi bi-globe"></i> Main Domain *</label>
-                        <input type="text" name="domain" class="form-control" placeholder="example.com or server.local" required>
+                        <label class="form-label"><i class="bi bi-globe"></i> <span data-i18n="mainDomainLabel">Main Domain</span> *</label>
+                        <input type="text" name="domain" class="form-control" data-i18n-placeholder="mainDomainPlaceholder" placeholder="example.com or server.local" required>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label"><i class="bi bi-diagram-3"></i> Subdomains</label>
-                        <input type="text" name="subdomains" class="form-control" placeholder="api.example.com, dev.example.com">
-                        <div class="form-hint">Comma‑separated</div>
+                        <label class="form-label"><i class="bi bi-diagram-3"></i> <span data-i18n="subdomainsLabel">Subdomains</span></label>
+                        <input type="text" name="subdomains" class="form-control" data-i18n-placeholder="subdomainsPlaceholder" placeholder="api.example.com, dev.example.com">
+                        <div class="form-hint"><span data-i18n="commaHint">Comma‑separated</span></div>
                     </div>
                 </div>
 
                 <!-- URLs + IPs -->
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <label class="form-label"><i class="bi bi-link-45deg"></i> Web Endpoints / URLs</label>
-                        <input type="text" name="urls" class="form-control" placeholder="https://example.com/login, https://example.com/admin">
+                        <label class="form-label"><i class="bi bi-link-45deg"></i> <span data-i18n="urlsLabel">Web Endpoints / URLs</span></label>
+                        <input type="text" name="urls" class="form-control" data-i18n-placeholder="urlsPlaceholder" placeholder="https://example.com/login, https://example.com/admin">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label"><i class="bi bi-hdd-network"></i> Server IPs</label>
-                        <input type="text" name="ips" class="form-control" placeholder="192.168.1.10, 10.0.0.5">
+                        <label class="form-label"><i class="bi bi-hdd-network"></i> <span data-i18n="ipsLabel">Server IPs</span></label>
+                        <input type="text" name="ips" class="form-control" data-i18n-placeholder="ipsPlaceholder" placeholder="192.168.1.10, 10.0.0.5">
                     </div>
                 </div>
 
                 <!-- Ports + Services -->
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <label class="form-label"><i class="bi bi-plug"></i> Open Ports</label>
-                        <input type="text" name="ports" class="form-control" placeholder="22, 80, 443">
+                        <label class="form-label"><i class="bi bi-plug"></i> <span data-i18n="portsLabel">Open Ports</span></label>
+                        <input type="text" name="ports" class="form-control" data-i18n-placeholder="portsPlaceholder" placeholder="22, 80, 443">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label"><i class="bi bi-hdd"></i> Services</label>
-                        <input type="text" name="services" class="form-control" placeholder="nginx:80, apache:443, ssh">
-                        <div class="form-hint">Format: <code>service:port</code> or service name</div>
+                        <label class="form-label"><i class="bi bi-hdd"></i> <span data-i18n="servicesLabel">Services</span></label>
+                        <input type="text" name="services" class="form-control" data-i18n-placeholder="servicesPlaceholder" placeholder="nginx:80, apache:443, ssh">
+                        <div class="form-hint"><span data-i18n="servicesHint">Format: </span><code>service:port</code> <span data-i18n="orServiceName">or service name</span></div>
                     </div>
                 </div>
 
                 <!-- Technologies + Emails -->
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <label class="form-label"><i class="bi bi-cpu"></i> Technologies</label>
-                        <input type="text" name="technologies" class="form-control" placeholder="WordPress, React, Cloudflare">
-                        <div class="form-hint">CMS, Frameworks, CDN, etc.</div>
+                        <label class="form-label"><i class="bi bi-cpu"></i> <span data-i18n="technologiesLabel">Technologies</span></label>
+                        <input type="text" name="technologies" class="form-control" data-i18n-placeholder="technologiesPlaceholder" placeholder="WordPress, React, Cloudflare">
+                        <div class="form-hint"><span data-i18n="technologiesHint">CMS, Frameworks, CDN, etc.</span></div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label"><i class="bi bi-envelope"></i> Email Addresses</label>
-                        <input type="text" name="emails" class="form-control" placeholder="admin@example.com, support@example.com">
+                        <label class="form-label"><i class="bi bi-envelope"></i> <span data-i18n="emailsLabel">Email Addresses</span></label>
+                        <input type="text" name="emails" class="form-control" data-i18n-placeholder="emailsPlaceholder" placeholder="admin@example.com, support@example.com">
                     </div>
                 </div>
 
                 <!-- Cloud + API -->
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <label class="form-label"><i class="bi bi-cloud"></i> Cloud Assets</label>
-                        <input type="text" name="cloud_assets" class="form-control" placeholder="myapp-bucket, storage.azure.com">
-                        <div class="form-hint">S3 buckets, Azure storage, GCP buckets</div>
+                        <label class="form-label"><i class="bi bi-cloud"></i> <span data-i18n="cloudLabel">Cloud Assets</span></label>
+                        <input type="text" name="cloud_assets" class="form-control" data-i18n-placeholder="cloudPlaceholder" placeholder="myapp-bucket, storage.azure.com">
+                        <div class="form-hint"><span data-i18n="cloudHint">S3 buckets, Azure storage, GCP buckets</span></div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label"><i class="bi bi-code-slash"></i> API Endpoints</label>
-                        <input type="text" name="api_endpoints" class="form-control" placeholder="https://api.example.com/v1">
-                        <div class="form-hint">Full API URLs</div>
+                        <label class="form-label"><i class="bi bi-code-slash"></i> <span data-i18n="apiLabel">API Endpoints</span></label>
+                        <input type="text" name="api_endpoints" class="form-control" data-i18n-placeholder="apiPlaceholder" placeholder="https://api.example.com/v1">
+                        <div class="form-hint"><span data-i18n="apiHint">Full API URLs</span></div>
                     </div>
                 </div>
 
@@ -299,10 +321,10 @@
                 <!-- Form actions -->
                 <div class="d-flex gap-3">
                     <button type="submit" class="btn btn-shodan-primary">
-                        <i class="bi bi-plus-circle"></i> Register Asset
+                        <i class="bi bi-plus-circle"></i> <span data-i18n="registerButton">Register Asset</span>
                     </button>
                     <a href="{{ url_for('dashboard') }}" class="btn btn-outline-shodan-secondary">
-                        <i class="bi bi-arrow-left"></i> Back
+                        <i class="bi bi-arrow-left"></i> <span data-i18n="backButton">Back</span>
                     </a>
                 </div>
             </form>
@@ -310,5 +332,139 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Translation strings
+        const translations = {
+            en: {
+                brand: "ASI",
+                adminLabel: "Admin",
+                addAsset: "Add Asset",
+                users: "Users",
+                logs: "Logs",
+                asiIntel: "ASI Intel",
+                logout: "Logout",
+                pageTitle: "Add New Asset",
+                mainDomainLabel: "Main Domain",
+                mainDomainPlaceholder: "example.com or server.local",
+                subdomainsLabel: "Subdomains",
+                subdomainsPlaceholder: "api.example.com, dev.example.com",
+                commaHint: "Comma‑separated",
+                urlsLabel: "Web Endpoints / URLs",
+                urlsPlaceholder: "https://example.com/login, https://example.com/admin",
+                ipsLabel: "Server IPs",
+                ipsPlaceholder: "192.168.1.10, 10.0.0.5",
+                portsLabel: "Open Ports",
+                portsPlaceholder: "22, 80, 443",
+                servicesLabel: "Services",
+                servicesPlaceholder: "nginx:80, apache:443, ssh",
+                servicesHint: "Format: ",
+                orServiceName: "or service name",
+                technologiesLabel: "Technologies",
+                technologiesPlaceholder: "WordPress, React, Cloudflare",
+                technologiesHint: "CMS, Frameworks, CDN, etc.",
+                emailsLabel: "Email Addresses",
+                emailsPlaceholder: "admin@example.com, support@example.com",
+                cloudLabel: "Cloud Assets",
+                cloudPlaceholder: "myapp-bucket, storage.azure.com",
+                cloudHint: "S3 buckets, Azure storage, GCP buckets",
+                apiLabel: "API Endpoints",
+                apiPlaceholder: "https://api.example.com/v1",
+                apiHint: "Full API URLs",
+                registerButton: "Register Asset",
+                backButton: "Back"
+            },
+            am: {
+                brand: "ASI",
+                adminLabel: "አስተዳዳሪ",
+                addAsset: "ንብረት ጨምር",
+                users: "ተጠቃሚዎች",
+                logs: "መዝገቦች",
+                asiIntel: "ASI መረጃ",
+                logout: "ውጣ",
+                pageTitle: "አዲስ ንብረት ጨምር",
+                mainDomainLabel: "ዋና ዶሜይን",
+                mainDomainPlaceholder: "ለምሳሌ: example.com ወይም server.local",
+                subdomainsLabel: "ንዑስ ዶሜይኖች",
+                subdomainsPlaceholder: "api.example.com, dev.example.com",
+                commaHint: "በነጠላ ሰረዝ ይለዩ",
+                urlsLabel: "የድር አገናኞች / URLs",
+                urlsPlaceholder: "https://example.com/login, https://example.com/admin",
+                ipsLabel: "አገልጋይ አይፒዎች",
+                ipsPlaceholder: "192.168.1.10, 10.0.0.5",
+                portsLabel: "ክፍት ፖርቶች",
+                portsPlaceholder: "22, 80, 443",
+                servicesLabel: "አገልግሎቶች",
+                servicesPlaceholder: "nginx:80, apache:443, ssh",
+                servicesHint: "ቅርጸት: ",
+                orServiceName: "ወይም የአገልግሎት ስም",
+                technologiesLabel: "ቴክኖሎጂዎች",
+                technologiesPlaceholder: "WordPress, React, Cloudflare",
+                technologiesHint: "ሲኤምኤስ፣ ማዕቀፎች፣ ሲዲኤን፣ ወዘተ",
+                emailsLabel: "ኢሜይል አድራሻዎች",
+                emailsPlaceholder: "admin@example.com, support@example.com",
+                cloudLabel: "ክላውድ ንብረቶች",
+                cloudPlaceholder: "myapp-bucket, storage.azure.com",
+                cloudHint: "የS3 ባልዲዎች፣ የAzure ማከማቻ፣ የGCP ባልዲዎች",
+                apiLabel: "API ነጥቦች",
+                apiPlaceholder: "https://api.example.com/v1",
+                apiHint: "ሙሉ የAPI URLs",
+                registerButton: "ንብረት ይመዝገቡ",
+                backButton: "ተመለስ"
+            }
+        };
+
+        function setLanguage(lang) {
+            const t = translations[lang];
+            if (!t) return;
+            // Update page title (browser tab)
+            document.getElementById('pageTitle').innerText = (lang === 'en' ? 'Add Asset · ASI Shodan Style' : 'ንብረት ጨምር · ASI ቅጥ');
+            // Update elements with data-i18n attribute
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key] !== undefined) {
+                    if (el.tagName === 'INPUT' && el.hasAttribute('placeholder')) {
+                        el.placeholder = t[key];
+                    } else {
+                        el.innerText = t[key];
+                    }
+                }
+            });
+            // Update placeholders for inputs that don't have data-i18n but have placeholder attribute (fallback)
+            const placeholdersMap = {
+                mainDomainPlaceholder: 'mainDomainPlaceholder',
+                subdomainsPlaceholder: 'subdomainsPlaceholder',
+                urlsPlaceholder: 'urlsPlaceholder',
+                ipsPlaceholder: 'ipsPlaceholder',
+                portsPlaceholder: 'portsPlaceholder',
+                servicesPlaceholder: 'servicesPlaceholder',
+                technologiesPlaceholder: 'technologiesPlaceholder',
+                emailsPlaceholder: 'emailsPlaceholder',
+                cloudPlaceholder: 'cloudPlaceholder',
+                apiPlaceholder: 'apiPlaceholder'
+            };
+            for (const [attr, key] of Object.entries(placeholdersMap)) {
+                const input = document.querySelector(`input[data-i18n-placeholder="${attr}"]`);
+                if (input && t[key]) input.placeholder = t[key];
+            }
+            // Update form hint texts that are not covered by data-i18n directly
+            const hintElements = document.querySelectorAll('.form-hint');
+            if (hintElements.length >= 5) {
+                // indices based on order: subdomain hint (0), services hint (1), technologies hint (2), cloud hint (3), api hint (4)
+                hintElements[0].innerHTML = `<span data-i18n="commaHint">${t.commaHint}</span>`;
+                hintElements[1].innerHTML = `<span data-i18n="servicesHint">${t.servicesHint}</span><code>service:port</code> <span data-i18n="orServiceName">${t.orServiceName}</span>`;
+                hintElements[2].innerHTML = `<span data-i18n="technologiesHint">${t.technologiesHint}</span>`;
+                hintElements[3].innerHTML = `<span data-i18n="cloudHint">${t.cloudHint}</span>`;
+                hintElements[4].innerHTML = `<span data-i18n="apiHint">${t.apiHint}</span>`;
+            }
+        }
+
+        // Event listener for language dropdown
+        document.getElementById('languageSelect').addEventListener('change', function(e) {
+            setLanguage(e.target.value);
+        });
+
+        // Set default language (English)
+        setLanguage('en');
+    </script>
 </body>
 </html>
