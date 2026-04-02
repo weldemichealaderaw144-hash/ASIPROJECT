@@ -8,6 +8,8 @@ import re
 import ipaddress
 import shutil
 import socket
+import secrets
+import string
 from collections import defaultdict
 from datetime import datetime, timezone, timedelta
 from functools import wraps
@@ -321,6 +323,21 @@ def convert_ports_to_urls(ports):
         else:
             urls.append(f"http://{ip}:{port}")
     return urls
+
+# ================= PASSWORD STRENGTH VALIDATOR =================
+def is_strong_password(password):
+    """Check password strength: min 8 chars, upper, lower, digit, special."""
+    if len(password) < 8:
+        return False, "Password must be at least 8 characters long."
+    if not re.search(r'[A-Z]', password):
+        return False, "Password must contain at least one uppercase letter."
+    if not re.search(r'[a-z]', password):
+        return False, "Password must contain at least one lowercase letter."
+    if not re.search(r'[0-9]', password):
+        return False, "Password must contain at least one digit."
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        return False, "Password must contain at least one special character."
+    return True, "Strong password."
 
 # ================= DECORATORS =================
 def login_required(f):
@@ -1157,6 +1174,9 @@ def register_routes(app):
                 return "All fields are required", 400
             if User.query.filter_by(username=username).first():
                 return "User already exists", 400
+            is_strong, msg = is_strong_password(password)
+            if not is_strong:
+                return msg, 400
             new_user = User(username=username, password=generate_password_hash(password), role=role)
             db.session.add(new_user)
             db.session.commit()
@@ -1194,6 +1214,9 @@ def register_routes(app):
             if role:
                 user.role = role
             if password:
+                is_strong, msg = is_strong_password(password)
+                if not is_strong:
+                    return msg, 400
                 user.password = generate_password_hash(password)
             db.session.commit()
             log_activity("EDIT_USER", user.username, severity="MEDIUM")
@@ -1861,12 +1884,17 @@ def register_routes(app):
         findings = run_nuclei(asset, [test_url])
         return jsonify({"asset_id": asset.id, "domain": asset.domain, "findings_count": len(findings), "findings": findings[:10]})
 
-
-
 def create_default_users():
     if User.query.count() == 0:
-        admin_pw = "admin"
-        analyst_pw = "analyst"
+        def random_strong_password():
+            alphabet = string.ascii_letters + string.digits + "!@#$%^&*"
+            while True:
+                password = ''.join(secrets.choice(alphabet) for _ in range(12))
+                if (any(c.islower() for c in password) and any(c.isupper() for c in password) and
+                    any(c.isdigit() for c in password) and any(c in "!@#$%^&*" for c in password)):
+                    return password
+        admin_pw = random_strong_password()
+        analyst_pw = random_strong_password()
 
         admin = User(
             username="admin",
@@ -1884,7 +1912,7 @@ def create_default_users():
         db.session.add(analyst)
         db.session.commit()
 
-        print("Default users created.")
+        print("Default users created with strong passwords.")
         print(f"Admin password: {admin_pw}")
         print(f"Analyst password: {analyst_pw}")
 
