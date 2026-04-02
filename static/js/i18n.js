@@ -28,6 +28,9 @@ const translations = {
         startScan: "Start Scan",
         editAsset: "Edit Asset",
         deleteAsset: "Delete",
+        backToDashboard: "Back to Dashboard",
+        backToASI: "Back to ASI",
+
         // Dashboard table headers
         thId: "ID",
         thDomain: "Domain",
@@ -41,6 +44,7 @@ const translations = {
         shadowCount: "Shadow",
         filterPlaceholder: "Filter by domain, IP, or tag...",
         applyFilter: "Apply",
+
         // Add asset page
         pageTitleAdd: "Add New Asset",
         mainDomainLabel: "Main Domain",
@@ -71,6 +75,7 @@ const translations = {
         apiHint: "Full API URLs",
         registerButton: "Register Asset",
         backButton: "Back",
+
         // Add user page
         pageTitleAddUser: "Add New User",
         usernameLabel: "Username",
@@ -78,6 +83,7 @@ const translations = {
         roleLabel: "Role",
         createUser: "Create User",
         cancel: "Cancel",
+
         // Activity logs
         pageTitleLogs: "Activity Logs",
         clearLogs: "Clear Logs",
@@ -89,6 +95,7 @@ const translations = {
         thStatus: "Status",
         thSeverity: "Severity",
         thIp: "IP",
+
         // ASI Intel page
         pageTitleIntel: "Attack Surface Intelligence",
         pageSubtitleIntel: "Assets · Risk Analysis · Discovery",
@@ -114,11 +121,44 @@ const translations = {
         assetBreakdown: "Asset Breakdown by Type",
         discoveryTools: "Discovery Tools & Risk Factors",
         recentDiscoveries: "Recent Discoveries",
-        // Asset dashboard
-        assetDashboardTitle: "Asset Dashboard",
+        mainDashboard: "Main Dashboard",
+        assetMap: "Asset Map",
         inventory: "Inventory",
+        shadows: "Shadows",
+        filterAssets: "Filter assets by name, type, or value...",
+        allRiskLevels: "All Risk Levels",
+        extreme: "Extreme (80+)",
+        severe: "Severe (50-79)",
+        critical: "Critical (20-49)",
+        high: "High (10-19)",
+        medium: "Medium (5-9)",
+        low: "Low (1-4)",
+        none: "None (0)",
+        riskScore: "Risk Score",
+        riskLevel: "Risk Level",
         vulnerabilities: "Vulnerabilities",
+        assetsFound: "Assets Found",
+        status: "Status",
+        actions: "Actions",
+        active: "Active",
+        paused: "Paused",
+        discoveryToolsList: "Discovery Tools",
+        riskFactorsList: "Risk Factors",
+        maxScore: "Maximum Score: 100",
+        scoresUpdate: "Scores update after each scan",
+        type: "Type",
+        value: "Value",
+        asset: "Asset",
+        discoveredBy: "Discovered By",
+        date: "Date",
+        scrollToTop: "Scroll to top",
+        addAssetQuick: "Add asset",
+        viewMap: "View map",
+
+        // Asset Dashboard (used in various places)
+        assetDashboardTitle: "Asset Dashboard",
         scanHistory: "Scan History",
+
         // Report page
         reportTitle: "Asset Security Report",
         overallRisk: "Overall Risk Assessment",
@@ -126,14 +166,42 @@ const translations = {
         riskBreakdown: "Risk Score Breakdown",
         completeInventory: "Complete Asset Inventory",
         print: "Print / Save as PDF",
+
         // Shadow assets page
         shadowTitle: "Shadow Assets",
         shadowDesc: "Assets detected outside approved inventory.",
-        // Vulnerabilities page
-        vulnTitle: "Vulnerabilities",
-        vulnFound: "Found vulnerabilities",
-        analystNotes: "Analyst Notes",
-        addNote: "Add analyst note..."
+        id: "ID",
+        mainDomain: "Main Domain",
+        typeCol: "Type",
+        valueCol: "Value",
+        version: "Version",
+        discoveredByCol: "Discovered By",
+        statusCol: "Status",
+        actionsCol: "Actions",
+        createdCol: "Created",
+        approve: "Approve",
+        reject: "Reject",
+        noShadows: "No shadow assets found.",
+
+        // Asset Map page
+        assetMapTitle: "Asset Relationship Map",
+        legend: "Legend",
+        statistics: "Statistics",
+        totalNodes: "Total Nodes",
+        totalConnections: "Total Connections",
+        nodeInfo: "Node Information",
+        assetType: "Asset (Domain)",
+        subdomainType: "Subdomain",
+        urlType: "URL",
+        ipType: "IP Address",
+        portType: "Port",
+        serviceType: "Service",
+        technologyType: "Technology",
+        emailType: "Email",
+        cloudAssetType: "Cloud Asset",
+        apiEndpointType: "API Endpoint",
+        statusLabel: "Status",
+        riskScoreLabel: "Risk Score",
     },
     am: {
         // === Login page ===
@@ -162,6 +230,9 @@ const translations = {
         startScan: "ቅኝት ጀምር",
         editAsset: "ንብረት አርትዕ",
         deleteAsset: "ሰርዝ",
+        backToDashboard: "ወደ ዳሽቦርድ ተመለስ",
+        backToASI: "ወደ ASI ተመለስ",
+
         // Dashboard table headers
         thId: "መታወቂያ",
         thDomain: "ዶሜይን",
@@ -175,6 +246,7 @@ const translations = {
         shadowCount: "ጥላ",
         filterPlaceholder: "በዶሜይን፣ አይፒ ወይም መለያ አጣራ",
         applyFilter: "ተግብር",
+
         // Add asset page
         pageTitleAdd: "አዲስ ንብረት ጨምር",
         mainDomainLabel: "ዋና ዶሜይን",
@@ -205,6 +277,7 @@ const translations = {
         apiHint: "ሙሉ API URLs",
         registerButton: "ንብረት ይመዝገቡ",
         backButton: "ተመለስ",
+
         // Add user page
         pageTitleAddUser: "አዲስ ተጠቃሚ ጨምር",
         usernameLabel: "የተጠቃሚ ስም",
@@ -212,6 +285,7 @@ const translations = {
         roleLabel: "ሚና",
         createUser: "ተጠቃሚ ፍጠር",
         cancel: "ሰርዝ",
+
         // Activity logs
         pageTitleLogs: "የእንቅስቃሴ መዝገቦች",
         clearLogs: "መዝገቦችን አጽዳ",
@@ -223,6 +297,7 @@ const translations = {
         thStatus: "ሁኔታ",
         thSeverity: "ክብደት",
         thIp: "አይፒ",
+
         // ASI Intel page
         pageTitleIntel: "Attack Surface Intelligence",
         pageSubtitleIntel: "ንብረቶች · ስጋት ትንተና · ግኝት",
@@ -248,11 +323,44 @@ const translations = {
         assetBreakdown: "በአይነት የንብረት ክፍፍል",
         discoveryTools: "የግኝት መሳሪያዎች እና ስጋት ምክንያቶች",
         recentDiscoveries: "የቅርብ ጊዜ ግኝቶች",
-        // Asset dashboard
-        assetDashboardTitle: "የንብረት ዳሽቦርድ",
+        mainDashboard: "ዋና ዳሽቦርድ",
+        assetMap: "የንብረት ካርታ",
         inventory: "ንብረት ዝርዝር",
+        shadows: "ጥላዎች",
+        filterAssets: "በስም፣ አይነት ወይም እሴት ንብረቶችን አጣራ",
+        allRiskLevels: "ሁሉም የአደጋ ደረጃዎች",
+        extreme: "ከፍተኛ (80+)",
+        severe: "ከባድ (50-79)",
+        critical: "ወሳኝ (20-49)",
+        high: "ከፍ (10-19)",
+        medium: "መካከለኛ (5-9)",
+        low: "ዝቅ (1-4)",
+        none: "ምንም (0)",
+        riskScore: "የአደጋ ነጥብ",
+        riskLevel: "የአደጋ ደረጃ",
         vulnerabilities: "ተጋላጭነቶች",
+        assetsFound: "የተገኙ ንብረቶች",
+        status: "ሁኔታ",
+        actions: "ድርጊቶች",
+        active: "ንቁ",
+        paused: "ቆሟል",
+        discoveryToolsList: "የግኝት መሳሪያዎች",
+        riskFactorsList: "የአደጋ ምክንያቶች",
+        maxScore: "ከፍተኛ ነጥብ: 100",
+        scoresUpdate: "ነጥቦች ከእያንዳንዱ ቅኝት በኋላ ይዘመናሉ",
+        type: "አይነት",
+        value: "እሴት",
+        asset: "ንብረት",
+        discoveredBy: "ተገኘ በ",
+        date: "ቀን",
+        scrollToTop: "ወደ ላይ ለማሸብለል",
+        addAssetQuick: "ንብረት ጨምር",
+        viewMap: "ካርታ ተመልከት",
+
+        // Asset Dashboard
+        assetDashboardTitle: "የንብረት ዳሽቦርድ",
         scanHistory: "የቅኝት ታሪክ",
+
         // Report page
         reportTitle: "የንብረት ደህንነት ሪፖርት",
         overallRisk: "አጠቃላይ ስጋት ግምገማ",
@@ -260,14 +368,42 @@ const translations = {
         riskBreakdown: "የስጋት ነጥብ ክፍፍል",
         completeInventory: "ሙሉ የንብረት ዝርዝር",
         print: "አትም / እንደ PDF አስቀምጥ",
+
         // Shadow assets page
         shadowTitle: "ጥላ ንብረቶች",
         shadowDesc: "ከተፈቀደ ንብረት ውጭ የተገኙ ንብረቶች።",
-        // Vulnerabilities page
-        vulnTitle: "ተጋላጭነቶች",
-        vulnFound: "ተጋላጭነቶች ተገኝተዋል",
-        analystNotes: "የተንታኝ ማስታወሻዎች",
-        addNote: "የተንታኝ ማስታወሻ ያክሉ..."
+        id: "መታወቂያ",
+        mainDomain: "ዋና ዶሜይን",
+        typeCol: "አይነት",
+        valueCol: "እሴት",
+        version: "ስሪት",
+        discoveredByCol: "ተገኘ በ",
+        statusCol: "ሁኔታ",
+        actionsCol: "ድርጊቶች",
+        createdCol: "ተፈጠረ",
+        approve: "ፀድቋል",
+        reject: "ውድቅ",
+        noShadows: "ምንም ጥላ ንብረቶች አልተገኙም።",
+
+        // Asset Map page
+        assetMapTitle: "የንብረት ግንኙነት ካርታ",
+        legend: "ማጣቀሻ",
+        statistics: "ስታቲስቲክስ",
+        totalNodes: "ጠቅላላ ኖዶች",
+        totalConnections: "ጠቅላላ ግንኙነቶች",
+        nodeInfo: "የኖድ መረጃ",
+        assetType: "ንብረት (ዶሜይን)",
+        subdomainType: "ንዑስ ዶሜይን",
+        urlType: "URL",
+        ipType: "አይፒ አድራሻ",
+        portType: "ወደብ",
+        serviceType: "አገልግሎት",
+        technologyType: "ቴክኖሎጂ",
+        emailType: "ኢሜይል",
+        cloudAssetType: "የደመና ንብረት",
+        apiEndpointType: "API ጫፍ",
+        statusLabel: "ሁኔታ",
+        riskScoreLabel: "የአደጋ ነጥብ",
     }
 };
 
@@ -283,6 +419,8 @@ function applyLanguage() {
             // If the element is an input placeholder
             if (el.tagName === 'INPUT' && el.hasAttribute('placeholder')) {
                 el.placeholder = t[key];
+            } else if (el.tagName === 'SELECT' && el.hasAttribute('data-i18n-options')) {
+                // Special handling for select options (optional)
             } else {
                 el.innerText = t[key];
             }
