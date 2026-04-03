@@ -1886,35 +1886,45 @@ def register_routes(app):
 
 def create_default_users():
     if User.query.count() == 0:
+
+        # 🔐 Strong password generator
         def random_strong_password():
             alphabet = string.ascii_letters + string.digits + "!@#$%^&*"
             while True:
                 password = ''.join(secrets.choice(alphabet) for _ in range(12))
-                if (any(c.islower() for c in password) and any(c.isupper() for c in password) and
-                    any(c.isdigit() for c in password) and any(c in "!@#$%^&*" for c in password)):
+                if (
+                    any(c.islower() for c in password) and
+                    any(c.isupper() for c in password) and
+                    any(c.isdigit() for c in password) and
+                    any(c in "!@#$%^&*" for c in password)
+                ):
                     return password
-        admin_pw = admin
-        analyst_pw =analyst
 
-        admin = User(
+        # ✅ Generate passwords (FIXED)
+        admin_pw = random_strong_password()
+        analyst_pw = random_strong_password()
+
+        # ✅ Create users
+        admin_user = User(
             username="admin",
             password=generate_password_hash(admin_pw),
             role="admin"
         )
 
-        analyst = User(
+        analyst_user = User(
             username="analyst",
             password=generate_password_hash(analyst_pw),
             role="analyst"
         )
 
-        db.session.add(admin)
-        db.session.add(analyst)
+        # ✅ Save to database
+        db.session.add(admin_user)
+        db.session.add(analyst_user)
         db.session.commit()
 
-        print("Default users created with strong passwords.")
-        print(f"Admin password: {admin_pw}")
-        print(f"Analyst password: {analyst_pw}")
+        print("\n✅ Default users created successfully!")
+        print(f"👤 Admin username: admin | Password: {admin_pw}")
+        print(f"👤 Analyst username: analyst | Password: {analyst_pw}")
 
 # ================= MAIN =================
 if __name__ == "__main__":
