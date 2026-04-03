@@ -1893,8 +1893,8 @@ def create_default_users():
                 if (any(c.islower() for c in password) and any(c.isupper() for c in password) and
                     any(c.isdigit() for c in password) and any(c in "!@#$%^&*" for c in password)):
                     return password
-        admin_pw = random_strong_password()
-        analyst_pw = random_strong_password()
+        admin_pw = admin
+        analyst_pw =analyst
 
         admin = User(
             username="admin",
