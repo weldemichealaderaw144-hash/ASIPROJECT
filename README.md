@@ -1,143 +1,201 @@
 # 🚀 ASIPROJECT
 
 ### የጥቃት ሜዳ መረጃ ፕላትፎርም (Attack Surface Intelligence Platform)
+
+🔗 GitHub:
 https://github.com/weldemichealaderaw144-hash/ASIPROJECT.git
----ከURL በመጠቀም Clone ያድርጉ
 
-## 📌 አጠቃላይ እይታ
+📥 Clone ለማድረግ:
 
-ASI Project የሳይበር ደህንነት (Cyber Security) ፕላትፎርም ሲሆን ለ reconnaissance, bug bounty, እና SOC analysis የተሟላ መሳሪያዎችን ያቀርባል።
-
-ይህ ፕላትፎርም የእርስዎን assets መፈለግ፣ የጥቃት ሜዳ ትንተና ማድረግ እና vulnerabilities መለየት በራሱ ያደርጋል።
-
----
-
-## 🔧 የተካተቱ መሣሪያዎች
-
-subfinder → ፈጣን subdomain መፈለጊያ  
-amass → የጥቃት ሜዳ ማስፋፊያ  
-assetfinder → domain እና subdomain መፈለጊያ  
-dnsx → DNS መሣሪያ  
-httpx → HTTP probing እና ቴክኖሎጂ መለያየት  
-katana → Web crawler  
-gau → ታሪካዊ URLs መሰብሰቢያ  
-nuclei → vulnerability scanner  
-gowitness → screenshot መሣሪያ (pending)  
-whatweb → የድህረገጽ ቴክኖሎጂ መለያየት  
-theHarvester → Email እና OSINT መረጃ  
-wappalyzer → Tech stack መለያየት  
+```bash
+ git clone https://github.com/weldemichealaderaw144-hash/ASIPROJECT.git
+  cd ASIPROJECT
+```
 
 ---
 
-## ⚙️ ቅድመ ሁኔታዎች
+# 📌 አጠቃላይ እይታ
 
-እነዚህን አስቀድሞ ይጫኑ:
+**ASI Project** የሳይበር ደህንነት ፕላትፎርም ሲሆን ለ:
 
-Go  
-Python  
-Git  
-Node.js (npm)  
+* Reconnaissance
+* Bug Bounty
+* SOC Analysis
 
----
+የተሟላ መሣሪያዎችን ያቀርባል።
 
-## 🐧 Kali Linux ላይ መጫን
-
-sudo apt update  
-sudo apt install golang-go python3 python3-pip git npm -y  
-
-### መሣሪያዎችን መጫን
-
-go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest  
-go install -v github.com/OWASP/Amass/v3/...@master  
-go install github.com/tomnomnom/assetfinder@latest  
-go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest  
-go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest  
-go install github.com/projectdiscovery/katana/cmd/katana@latest  
-go install github.com/lc/gau/v2/cmd/gau@latest  
-go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest  
-go install github.com/sensepost/gowitness@latest  
-
-### ሌሎች መሣሪያዎች
-
-sudo apt install whatweb theharvester -y  
-npm install -g wappalyzer  
-
-### PATH ማስተካከል
-
-echo 'export PATH=$PATH:$HOME/go/bin' >> ~/.bashrc  
-source ~/.bashrc  
+👉 የorganization assets መፈለግ
+👉 attack surface ትንተና
+👉 vulnerabilities መለየት
+👉 የስጋት ደረጃ መገምገም
 
 ---
 
-## 🪟 Windows ላይ መጫን
+# 🔧 የተካተቱ መሣሪያዎች (All Tools)
 
-Go አጫን እና %GOPATH%\bin ወደ PATH ያክሉ  
+### 🌐 Subdomain & Asset Discovery
 
-go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest  
-go install -v github.com/OWASP/Amass/v3/...@master  
-go install github.com/tomnomnom/assetfinder@latest  
-go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest  
-go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest  
-go install github.com/projectdiscovery/katana/cmd/katana@latest  
-go install github.com/lc/gau/v2/cmd/gau@latest  
-go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest  
-go install github.com/sensepost/gowitness@latest  
+SUBFINDER_PATH = find_tool("subfinder")
+👉 subdomains ለመፈለግ
 
-💡 Tip: WSL2 + Kali Linux መጠቀም ይመከራል  
+AMASS_PATH = find_tool("amass")
+👉 ትልቅ attack surface mapping
+
+ASSETFINDER_PATH = find_tool("assetfinder")
+👉 ቀላል subdomain discovery
 
 ---
 
-## ▶️ አጠቃቀም ምሳሌዎች
+### 🌍 Web Probing & Crawling
 
-subfinder -d example.com -silent  
+HTTPX_PATH = find_tool("httpx")
+👉 live websites ለመፈተሽ
 
-amass enum -d example.com  
+KATANA_PATH = find_tool("katana")
+👉 URLs & endpoints crawling
 
-gau example.com  
-
-cat subdomains.txt | httpx -status-code -title  
-
-nuclei -u https://example.com -t cves/  
-
----
-
-## 🧠 ASI ምንድን ነው?
-
-Attack Surface Intelligence (ASI) ማለት የአንድ organization የሚታዩ እና የሚደርሱ ቴክኖሎጂ ንብረቶችን (assets) መሰብሰብ፣ መከታተል እና አደጋ መገምገም ነው።
+GAU_PATH = find_tool("gau")
+👉 archived URLs ለማግኘት
 
 ---
 
-## 📦 Assets
+### 🔍 Vulnerability Scanning
 
-Main Domain → example.com  
-Subdomains → api.example.com, dev.example.com  
-URLs → https://example.com/login  
-Server IPs → 192.168.1.10  
-Ports → 22, 80, 443  
-Services → nginx:80, apache:443  
-Technologies → WordPress, React, Cloudflare  
-Emails → admin@example.com  
-Cloud → AWS S3, Azure, GCP  
-API → /api/v1/users  
+NUCLEI_PATH = find_tool("nuclei")
+👉 vulnerabilities ፈጣን scan
+
+SUBZY_PATH = find_tool("subzy")
+👉 subdomain takeover ለመፈለግ
 
 ---
 
-## 🎯 ዓላማ
+### 🌐 Network & DNS Analysis
 
-መረጃዎችን በአንድ ቦታ ማሰባሰብ፣ monitoring ማድረግ እና የደህንነት አደጋ መገምገም ነው።
+NAABU_PATH = find_tool("naabu")
+👉 open ports scan
 
----
-
-## 🔐 አጠቃቀም
-
-Bug Bounty  
-Red Team Recon  
-SOC Monitoring  
-Asset Inventory  
+DNSX_PATH = find_tool("dnsx")
+👉 DNS verification
 
 ---
 
-## 👨‍💻 ደራሲ
+### 🖥️ Technology Detection
 
-Weldemicheal 🇪🇹  
+WHATWEB_PATH = find_tool("whatweb")
+👉 server & CMS detection
+
+WAPPALYZER_PATH = find_tool("wappalyzer")
+👉 frameworks & libraries detection
+
+---
+
+### 📸 Visualization & OSINT
+
+GOWITNESS_PATH = find_tool("gowitness")
+👉 website screenshot
+
+THEHARVESTER_PATH = find_tool("theharvester")
+👉 email & OSINT data collection
+
+---
+
+# ⚙️ ቅድመ ሁኔታዎች (Prerequisites)
+
+* Go
+* Python
+* Git
+* Node.js (npm)
+
+---
+
+# 🐧 Kali Linux ላይ መጫን
+
+```bash
+sudo apt update
+sudo apt install golang-go python3 python3-pip git npm -y
+```
+
+---
+
+# 🧰 Tools መጫኛ (Install All)
+
+```bash
+go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
+go install -v github.com/OWASP/Amass/v3/...@master
+go install github.com/tomnomnom/assetfinder@latest
+go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest
+go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
+go install github.com/projectdiscovery/katana/cmd/katana@latest
+go install github.com/projectdiscovery/naabu/v2/cmd/naabu@latest
+go install github.com/lc/gau/v2/cmd/gau@latest
+go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+go install github.com/sensepost/gowitness@latest
+go install github.com/PentestPad/subzy@latest
+```
+
+---
+
+# 🟢 PATH ማስተካከል
+
+```bash
+echo 'export PATH=$PATH:~/go/bin' >> ~/.bashrc
+source ~/.bashrc
+```
+
+---
+
+# ▶️ አጠቃቀም ምሳሌ
+
+```bash
+subfinder -d example.com -silent
+amass enum -d example.com
+gau example.com
+cat subdomains.txt | httpx -status-code -title
+naabu -host example.com
+nuclei -u https://example.com
+```
+
+---
+
+# 🧠 ASI ምንድን ነው?
+
+ASI = የorganization የሚታዩ assets መሰብሰብ እና አደጋ መገምገም
+
+---
+
+# 📦 Assets
+
+* Domain
+* Subdomain
+* URLs
+* IP
+* Ports
+* Services
+* Technologies
+* Emails
+* Cloud
+* APIs
+
+---
+
+# 🎯 ዓላማ
+
+✔️ መረጃ ማሰባሰብ
+✔️ Monitoring
+✔️ Risk Analysis
+
+---
+
+# 🔐 አጠቃቀም
+
+* Bug Bounty
+* Red Team
+* SOC
+* Asset Management
+
+---
+
+# 👨‍💻 ደራሲ
+
+**Weldemicheal 🇪🇹**
 Cyber Security Enthusiast
